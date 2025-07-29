@@ -68,7 +68,7 @@ RUN apt-get update && apt-get install -y \
     libpq5 \
     libfreetype6 \
     libjpeg62-turbo \
-    libicu67 \
+    libicu72 \
     supervisor \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
