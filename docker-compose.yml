@@ -1,0 +1,166 @@
+version: '3.8'
+
+services:
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: unified-api-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./public:/var/www/html/public:ro
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/:ro
+      - ./docker/nginx/ssl/:/etc/nginx/ssl/:ro
+      - nginx_logs:/var/log/nginx
+    environment:
+      - TZ=${TIMEZONE:-Asia/Taipei}
+    depends_on:
+      laravel:
+        condition: service_healthy
+    networks:
+      - unified-api-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Laravel Application
+  laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_ENV=${APP_ENV:-production}
+    container_name: unified-api-laravel
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./storage/logs:/var/www/html/storage/logs
+      - php_logs:/var/log
+    env_file:
+      - .env
+    environment:
+      - TZ=${TIMEZONE:-Asia/Taipei}
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - unified-api-network
+    healthcheck:
+      test: ["CMD", "php", "artisan", "tinker", "--execute=echo 'OK';"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # MySQL Database
+  database:
+    image: mysql:8.0
+    container_name: unified-api-database
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE:-unified_api}
+      - MYSQL_USER=${DB_USERNAME:-api_user}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-api_password}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root_password}
+      - TZ=${TIMEZONE:-Asia/Taipei}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf:ro
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+      - mysql_logs:/var/log/mysql
+    ports:
+      - "${DB_EXTERNAL_PORT:-3306}:3306"
+    networks:
+      - unified-api-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root_password}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    command: --default-authentication-plugin=mysql_native_password
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: unified-api-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    ports:
+      - "${REDIS_EXTERNAL_PORT:-6379}:6379"
+    networks:
+      - unified-api-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    command: redis-server /usr/local/etc/redis/redis.conf
+    environment:
+      - TZ=${TIMEZONE:-Asia/Taipei}
+
+  # PhpMyAdmin (開發用)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: unified-api-phpmyadmin
+    restart: unless-stopped
+    environment:
+      - PMA_HOST=database
+      - PMA_USER=${DB_USERNAME:-api_user}
+      - PMA_PASSWORD=${DB_PASSWORD:-api_password}
+      - UPLOAD_LIMIT=100M
+      - TZ=${TIMEZONE:-Asia/Taipei}
+    ports:
+      - "${PHPMYADMIN_PORT:-8080}:80"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - unified-api-network
+    profiles:
+      - development
+
+  # Mailpit (開發用郵件測試)
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: unified-api-mailpit
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_WEB_PORT:-8025}:8025"
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+    networks:
+      - unified-api-network
+    profiles:
+      - development
+
+# Docker網路
+networks:
+  unified-api-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Docker卷
+volumes:
+  db_data:
+    driver: local
+  redis_data:
+    driver: local
+  nginx_logs:
+    driver: local
+  php_logs:
+    driver: local
+  mysql_logs:
+    driver: local

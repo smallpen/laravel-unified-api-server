@@ -1,0 +1,103 @@
+# Laravel 統一 API Server 日誌輪轉配置
+# 此檔案應該放置在 /etc/logrotate.d/ 目錄下
+
+/var/www/html/storage/logs/*.log {
+    # 每日輪轉
+    daily
+    
+    # 保留 30 天的日誌
+    rotate 30
+    
+    # 壓縮舊的日誌檔案
+    compress
+    
+    # 延遲壓縮到下一次輪轉
+    delaycompress
+    
+    # 如果日誌檔案不存在，不報錯
+    missingok
+    
+    # 如果日誌檔案為空，不輪轉
+    notifempty
+    
+    # 建立新的日誌檔案，設定權限和擁有者
+    create 644 www-data www-data
+    
+    # 輪轉後執行的腳本
+    postrotate
+        # 重新載入 PHP-FPM 以釋放日誌檔案句柄
+        if [ -f /var/run/php-fpm.pid ]; then
+            kill -USR1 `cat /var/run/php-fpm.pid`
+        fi
+        
+        # 通知 Laravel 應用程式日誌檔案已輪轉
+        if [ -f /var/www/html/artisan ]; then
+            cd /var/www/html && php artisan cache:clear > /dev/null 2>&1 || true
+        fi
+    endscript
+    
+    # 使用日期作為副檔名
+    dateext
+    
+    # 日期格式
+    dateformat -%Y%m%d
+    
+    # 複製並截斷原檔案而不是移動
+    copytruncate
+}
+
+# API 請求日誌特殊處理
+/var/www/html/storage/logs/api_requests*.log {
+    daily
+    rotate 60
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 www-data www-data
+    dateext
+    dateformat -%Y%m%d
+    copytruncate
+    
+    # 大小限制：超過 100MB 立即輪轉
+    size 100M
+}
+
+# 安全日誌特殊處理
+/var/www/html/storage/logs/security*.log {
+    daily
+    rotate 90
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 www-data www-data
+    dateext
+    dateformat -%Y%m%d
+    copytruncate
+    
+    # 安全日誌需要更長的保存期間
+    maxage 90
+}
+
+# 錯誤日誌特殊處理
+/var/www/html/storage/logs/errors*.log {
+    daily
+    rotate 60
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 644 www-data www-data
+    dateext
+    dateformat -%Y%m%d
+    copytruncate
+    
+    # 錯誤日誌在輪轉後發送通知
+    postrotate
+        # 檢查是否有新的錯誤日誌
+        if [ -s /var/www/html/storage/logs/errors.log ]; then
+            echo "發現新的錯誤日誌，請檢查系統狀態" | logger -t laravel-api-errors
+        fi
+    endscript
+}

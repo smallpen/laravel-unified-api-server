@@ -1,0 +1,37 @@
+{
+  "user.info": {
+    "permissions": ["user.read"],
+    "description": "取得使用者資訊",
+    "is_active": true
+  },
+  "user.update": {
+    "permissions": ["user.update"],
+    "description": "更新使用者資料",
+    "is_active": true
+  },
+  "user.change_password": {
+    "permissions": ["user.change_password"],
+    "description": "變更使用者密碼",
+    "is_active": true
+  },
+  "user.list": {
+    "permissions": ["user.list", "admin.read"],
+    "description": "取得使用者清單（需要管理員權限）",
+    "is_active": true
+  },
+  "system.info": {
+    "permissions": ["system.read"],
+    "description": "取得系統資訊",
+    "is_active": true
+  },
+  "system.server_status": {
+    "permissions": ["system.server_status", "admin.read"],
+    "description": "取得伺服器狀態（需要管理員權限）",
+    "is_active": true
+  },
+  "system.ping": {
+    "permissions": [],
+    "description": "系統連線測試（無權限要求）",
+    "is_active": true
+  }
+}

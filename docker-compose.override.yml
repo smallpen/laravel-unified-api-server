@@ -1,0 +1,29 @@
+# Docker Compose開發環境覆蓋設定
+# 此檔案會自動與docker-compose.yml合併
+
+version: '3.8'
+
+services:
+  # 開發環境的Laravel設定
+  laravel:
+    build:
+      args:
+        - APP_ENV=local
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - LOG_LEVEL=debug
+
+  # 開發環境的Nginx設定
+  nginx:
+    volumes:
+      - ./:/var/www/html
+
+  # 啟用開發工具
+  phpmyadmin:
+    profiles: []  # 移除profile限制，在開發環境中總是啟動
+
+  mailpit:
+    profiles: []  # 移除profile限制，在開發環境中總是啟動
