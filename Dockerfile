@@ -86,12 +86,18 @@ COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # 複製應用程式檔案
 COPY --chown=www:www . /var/www/html
 
-# 設定目錄權限
-RUN chown -R www:www /var/www/html && \
+# 建立必要的Laravel目錄結構並設定權限
+RUN mkdir -p /var/www/html/storage/app/public && \
+    mkdir -p /var/www/html/storage/framework/cache/data && \
+    mkdir -p /var/www/html/storage/framework/sessions && \
+    mkdir -p /var/www/html/storage/framework/views && \
+    mkdir -p /var/www/html/storage/logs && \
+    mkdir -p /var/www/html/bootstrap/cache && \
+    chown -R www:www /var/www/html && \
     chmod -R 755 /var/www/html/storage && \
     chmod -R 755 /var/www/html/bootstrap/cache
 
-# 建立必要的目錄
+# 建立supervisor日誌目錄
 RUN mkdir -p /var/log/supervisor && \
     chown -R www:www /var/log/supervisor
 

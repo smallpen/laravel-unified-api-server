@@ -1,0 +1,53 @@
+# Git 相關
+.git
+.gitignore
+.gitattributes
+
+# 開發工具
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 文檔
+README.md
+CONTRIBUTING.md
+CHANGELOG.md
+docs/
+
+# 測試檔案
+tests/
+phpunit.xml
+.phpunit.result.cache
+
+# Node.js 相關
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# 開發環境檔案
+.env.example
+docker-compose.yml
+docker-compose.override.yml
+docker-compose.prod.yml
+
+# 暫存檔案
+*.tmp
+*.temp
+*.log
+*.bak
+*.backup
+
+# OS 檔案
+.DS_Store
+Thumbs.db
+
+# Laravel 快取檔案（這些會在容器中重新生成）
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*.log
+/bootstrap/cache/*.php
+
+# Vendor 目錄（在 Dockerfile 中單獨處理）
+vendor/
