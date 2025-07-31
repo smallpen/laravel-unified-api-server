@@ -107,7 +107,8 @@ RUN mkdir -p /var/www/html/storage/app/public && \
     mkdir -p /var/www/html/bootstrap/cache && \
     chown -R www:www /var/www/html && \
     chmod -R 755 /var/www/html/storage && \
-    chmod -R 755 /var/www/html/bootstrap/cache
+    chmod -R 755 /var/www/html/bootstrap/cache && \
+    chown -R www:www /var/www/html/bootstrap/cache
 
 # 建立supervisor日誌目錄
 RUN mkdir -p /var/log/supervisor && \

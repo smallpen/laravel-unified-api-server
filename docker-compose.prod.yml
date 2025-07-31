@@ -1,7 +1,5 @@
 # Docker Compose生產環境設定
 
-version: '3.8'
-
 services:
   # 生產環境的Nginx設定
   nginx:
