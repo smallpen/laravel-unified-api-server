@@ -53,6 +53,15 @@ else
     echo "跳過資料庫遷移（資料庫不可用）"
 fi
 
+# 確保必要的目錄結構存在
+echo "檢查並建立必要的目錄結構..."
+mkdir -p /var/www/html/storage/app/public
+mkdir -p /var/www/html/storage/framework/cache/data
+mkdir -p /var/www/html/storage/framework/sessions
+mkdir -p /var/www/html/storage/framework/views
+mkdir -p /var/www/html/storage/logs
+mkdir -p /var/www/html/bootstrap/cache
+
 # 確保儲存目錄權限正確
 echo "設定儲存目錄權限..."
 chown -R www:www /var/www/html/storage
@@ -62,22 +71,35 @@ chmod -R 755 /var/www/html/storage
 chmod -R 755 /var/www/html/bootstrap/cache
 chmod -R 755 /var/log/supervisor
 
-# 執行套件發現
-echo "執行套件發現..."
-php artisan package:discover --ansi
+# 測試服務綁定
+echo "測試服務綁定..."
+if php /var/www/html/test-binding.php; then
+    echo "✓ 服務綁定測試通過"
+    
+    # 執行套件發現
+    echo "執行套件發現..."
+    php artisan package:discover --ansi
+else
+    echo "✗ 服務綁定測試失敗，跳過套件發現"
+fi
 
 # 清除快取
 echo "清除應用程式快取..."
-php artisan config:clear
-php artisan cache:clear
-php artisan view:clear
-php artisan route:clear
+php artisan config:clear || echo "配置清除失敗，繼續執行..."
+php artisan route:clear || echo "路由清除失敗，繼續執行..."
+
+# 跳過視圖快取清除（API 專案通常不需要視圖）
+echo "跳過視圖快取清除（API 專案）"
+
+# 手動清除快取檔案
+echo "手動清除快取檔案..."
+rm -rf /var/www/html/storage/framework/cache/data/* || true
+rm -rf /var/www/html/storage/framework/views/* || true
+rm -rf /var/www/html/bootstrap/cache/*.php || true
 
 # 重新建立快取
 echo "重新建立快取..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+php artisan config:cache || echo "配置快取建立失敗，繼續執行..."
 
 echo "Laravel 應用程式啟動完成！"
 

@@ -70,10 +70,28 @@ check_requirements() {
 create_directories() {
     log_info "建立必要目錄..."
     
+    # 建立部署相關目錄
     mkdir -p "$BACKUP_DIR"
     mkdir -p "$LOG_DIR"
-    mkdir -p "storage/logs"
+    
+    # 建立 Laravel 儲存目錄結構
+    log_info "初始化 Laravel 儲存目錄結構..."
+    mkdir -p "storage/app"
     mkdir -p "storage/app/public"
+    mkdir -p "storage/framework"
+    mkdir -p "storage/framework/cache"
+    mkdir -p "storage/framework/cache/data"
+    mkdir -p "storage/framework/sessions"
+    mkdir -p "storage/framework/views"
+    mkdir -p "storage/logs"
+    mkdir -p "bootstrap/cache"
+    
+    # 為空目錄加入 .gitkeep 檔案
+    for dir in "storage/app" "storage/app/public" "storage/framework/cache" "storage/framework/sessions" "storage/framework/views"; do
+        if [ ! -f "$dir/.gitkeep" ] && [ -z "$(ls -A "$dir" 2>/dev/null)" ]; then
+            touch "$dir/.gitkeep"
+        fi
+    done
     
     log_success "目錄建立完成"
 }
