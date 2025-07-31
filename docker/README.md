@@ -59,10 +59,10 @@ docker/
 
 ```bash
 # 開發環境
-docker-compose up -d
+docker compose up -d
 
 # 生產環境
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+docker compose -f docker compose.yml -f docker compose.prod.yml up -d
 ```
 
 ## 環境配置
@@ -240,13 +240,13 @@ SSL_REDIRECT=false
 
 1. **容器無法啟動**
    ```bash
-   docker-compose logs [服務名稱]
+   docker compose logs [服務名稱]
    ```
 
 2. **資料庫連線失敗**
    ```bash
    ./manage.sh status
-   docker-compose exec database mysql -u root -p
+   docker compose exec database mysql -u root -p
    ```
 
 3. **權限問題**

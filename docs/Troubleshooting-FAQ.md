@@ -10,7 +10,7 @@
 
 #### Q1: Docker容器無法啟動
 
-**問題描述**：執行 `docker-compose up` 時容器無法正常啟動
+**問題描述**：執行 `docker compose up` 時容器無法正常啟動
 
 **可能原因**：
 - 端口被佔用
@@ -26,17 +26,17 @@ sudo netstat -tulpn | grep :80
 sudo netstat -tulpn | grep :3306
 
 # 2. 停止並清理現有容器
-docker-compose down
+docker compose down
 docker system prune -f
 
 # 3. 檢查磁碟空間
 df -h
 
 # 4. 重新建立容器
-docker-compose up -d --build
+docker compose up -d --build
 
 # 5. 查看容器日誌
-docker-compose logs -f
+docker compose logs -f
 ```
 
 #### Q2: 資料庫遷移失敗
@@ -52,18 +52,18 @@ docker-compose logs -f
 
 ```bash
 # 1. 檢查資料庫容器狀態
-docker-compose ps database
+docker compose ps database
 
 # 2. 檢查資料庫連線設定
-docker-compose exec laravel php artisan tinker
+docker compose exec laravel php artisan tinker
 >>> DB::connection()->getPdo();
 
 # 3. 手動建立資料庫
-docker-compose exec database mysql -u root -p
+docker compose exec database mysql -u root -p
 CREATE DATABASE api_server;
 
 # 4. 重新執行遷移
-docker-compose exec laravel php artisan migrate:fresh
+docker compose exec laravel php artisan migrate:fresh
 ```
 
 #### Q3: Composer依賴安裝失敗
@@ -74,16 +74,16 @@ docker-compose exec laravel php artisan migrate:fresh
 
 ```bash
 # 1. 清除Composer快取
-docker-compose exec laravel composer clear-cache
+docker compose exec laravel composer clear-cache
 
 # 2. 使用中國鏡像（如果在中國地區）
-docker-compose exec laravel composer config repo.packagist composer https://mirrors.aliyun.com/composer/
+docker compose exec laravel composer config repo.packagist composer https://mirrors.aliyun.com/composer/
 
 # 3. 增加記憶體限制
-docker-compose exec laravel php -d memory_limit=2G /usr/local/bin/composer install
+docker compose exec laravel php -d memory_limit=2G /usr/local/bin/composer install
 
 # 4. 忽略平台要求（僅開發環境）
-docker-compose exec laravel composer install --ignore-platform-reqs
+docker compose exec laravel composer install --ignore-platform-reqs
 ```
 
 ### 2. API呼叫問題
@@ -105,7 +105,7 @@ docker-compose exec laravel composer install --ignore-platform-reqs
 # 正確格式：Authorization: Bearer your-token-here
 
 # 2. 檢查Token是否存在
-docker-compose exec laravel php artisan tinker
+docker compose exec laravel php artisan tinker
 >>> use App\Models\ApiToken;
 >>> ApiToken::where('token_hash', hash('sha256', 'your-token'))->first();
 
@@ -136,17 +136,17 @@ curl -X POST http://localhost:8000/api/ \
 
 ```bash
 # 1. 檢查Action是否已註冊
-docker-compose exec laravel php artisan action:list
+docker compose exec laravel php artisan action:list
 
 # 2. 檢查Action類別是否存在
 ls app/Actions/
 
 # 3. 清除快取
-docker-compose exec laravel php artisan cache:clear
-docker-compose exec laravel php artisan config:clear
+docker compose exec laravel php artisan cache:clear
+docker compose exec laravel php artisan config:clear
 
 # 4. 重新註冊Action
-docker-compose exec laravel php artisan action:discover
+docker compose exec laravel php artisan action:discover
 ```
 
 #### Q6: 參數驗證失敗
@@ -162,7 +162,7 @@ docker-compose exec laravel php artisan action:discover
 
 ```bash
 # 1. 檢查Action的驗證規則
-docker-compose exec laravel php artisan tinker
+docker compose exec laravel php artisan tinker
 >>> $action = new App\Actions\YourAction();
 >>> $action->getDocumentation()['parameters'];
 
@@ -186,14 +186,14 @@ docker-compose exec laravel php artisan tinker
 docker stats
 
 # 2. 檢查資料庫慢查詢
-docker-compose exec database mysql -u root -p -e "
+docker compose exec database mysql -u root -p -e "
 SET GLOBAL slow_query_log = 'ON';
 SET GLOBAL long_query_time = 1;
 SHOW VARIABLES LIKE 'slow_query_log%';
 "
 
 # 3. 檢查PHP-FPM狀態
-docker-compose exec laravel php-fpm -t
+docker compose exec laravel php-fpm -t
 
 # 4. 分析日誌檔案
 tail -f storage/logs/laravel.log | grep "Action執行"
@@ -203,9 +203,9 @@ tail -f storage/logs/laravel.log | grep "Action執行"
 
 ```bash
 # 1. 啟用快取
-docker-compose exec laravel php artisan config:cache
-docker-compose exec laravel php artisan route:cache
-docker-compose exec laravel php artisan view:cache
+docker compose exec laravel php artisan config:cache
+docker compose exec laravel php artisan route:cache
+docker compose exec laravel php artisan view:cache
 
 # 2. 優化資料庫查詢
 # 在Action中使用 select() 限制查詢欄位
@@ -229,7 +229,7 @@ opcache.max_accelerated_files=4000
 docker stats --no-stream
 
 # 2. 檢查PHP記憶體使用
-docker-compose exec laravel php -i | grep memory_limit
+docker compose exec laravel php -i | grep memory_limit
 
 # 3. 分析記憶體洩漏
 # 在Action中添加記憶體使用監控
@@ -245,7 +245,7 @@ memory_get_peak_usage(true)
 memory_limit = 256M
 
 # 2. 重啟服務釋放記憶體
-docker-compose restart
+docker compose restart
 
 # 3. 優化程式碼
 # 避免在Action中載入大量資料
@@ -263,10 +263,10 @@ docker-compose restart
 
 ```bash
 # 1. 檢查當前連線數
-docker-compose exec database mysql -u root -p -e "SHOW PROCESSLIST;"
+docker compose exec database mysql -u root -p -e "SHOW PROCESSLIST;"
 
 # 2. 檢查最大連線數設定
-docker-compose exec database mysql -u root -p -e "SHOW VARIABLES LIKE 'max_connections';"
+docker compose exec database mysql -u root -p -e "SHOW VARIABLES LIKE 'max_connections';"
 
 # 3. 調整連線數限制
 # 編輯 docker/mysql/my.cnf
@@ -274,7 +274,7 @@ docker-compose exec database mysql -u root -p -e "SHOW VARIABLES LIKE 'max_conne
 max_connections = 200
 
 # 4. 重啟資料庫服務
-docker-compose restart database
+docker compose restart database
 ```
 
 #### Q10: 資料庫鎖定問題
@@ -285,13 +285,13 @@ docker-compose restart database
 
 ```bash
 # 1. 檢查當前鎖定狀態
-docker-compose exec database mysql -u root -p -e "
+docker compose exec database mysql -u root -p -e "
 SELECT * FROM information_schema.INNODB_LOCKS;
 SELECT * FROM information_schema.INNODB_LOCK_WAITS;
 "
 
 # 2. 檢查長時間運行的查詢
-docker-compose exec database mysql -u root -p -e "
+docker compose exec database mysql -u root -p -e "
 SELECT * FROM information_schema.PROCESSLIST 
 WHERE COMMAND != 'Sleep' AND TIME > 10;
 "
@@ -310,7 +310,7 @@ WHERE COMMAND != 'Sleep' AND TIME > 10;
 
 ```bash
 # 1. 檢查使用者權限
-docker-compose exec laravel php artisan tinker
+docker compose exec laravel php artisan tinker
 >>> $user = App\Models\User::find(1);
 >>> $user->getPermissions();
 
@@ -344,7 +344,7 @@ add_header Access-Control-Allow-Methods "GET, POST, OPTIONS";
 add_header Access-Control-Allow-Headers "Authorization, Content-Type";
 
 # 3. 重啟服務
-docker-compose restart nginx
+docker compose restart nginx
 ```
 
 ### 6. 日誌和監控問題
@@ -415,16 +415,16 @@ grep "ERROR" storage/logs/laravel.log | sort | uniq -c | sort -nr | head -10
 
 ```bash
 # 啟用查詢日誌
-docker-compose exec laravel php artisan tinker
+docker compose exec laravel php artisan tinker
 >>> DB::enableQueryLog();
 >>> // 執行一些操作
 >>> DB::getQueryLog();
 
 # 檢查資料庫狀態
-docker-compose exec database mysql -u root -p -e "SHOW STATUS;"
+docker compose exec database mysql -u root -p -e "SHOW STATUS;"
 
 # 分析慢查詢
-docker-compose exec database mysql -u root -p -e "
+docker compose exec database mysql -u root -p -e "
 SELECT * FROM mysql.slow_log 
 ORDER BY start_time DESC 
 LIMIT 10;
@@ -480,7 +480,7 @@ done
 cd /var/www/laravel-unified-api-server
 
 # 1. 停止所有服務
-docker-compose down
+docker compose down
 
 # 2. 檢查系統資源
 free -h
@@ -490,10 +490,10 @@ df -h
 docker system prune -f
 
 # 4. 重新啟動服務
-docker-compose up -d
+docker compose up -d
 
 # 5. 檢查服務狀態
-docker-compose ps
+docker compose ps
 curl -X POST http://localhost/api/ -d '{"action_type": "system.ping"}'
 ```
 
@@ -502,13 +502,13 @@ curl -X POST http://localhost/api/ -d '{"action_type": "system.ping"}'
 ```bash
 # 資料庫修復程序
 # 1. 停止應用程式
-docker-compose stop laravel
+docker compose stop laravel
 
 # 2. 備份當前資料庫
-docker-compose exec database mysqldump -u root -p api_server > emergency_backup.sql
+docker compose exec database mysqldump -u root -p api_server > emergency_backup.sql
 
 # 3. 修復資料庫
-docker-compose exec database mysql -u root -p -e "
+docker compose exec database mysql -u root -p -e "
 USE api_server;
 REPAIR TABLE users;
 REPAIR TABLE api_tokens;
@@ -522,7 +522,7 @@ CHECK TABLE api_logs;
 # mysql -u root -p api_server < latest_backup.sql
 
 # 5. 重啟應用程式
-docker-compose start laravel
+docker compose start laravel
 ```
 
 ### 3. 高負載處理
@@ -537,17 +537,17 @@ top
 # 臨時調整 config/api.php 中的速率限制
 
 # 3. 啟用維護模式
-docker-compose exec laravel php artisan down --message="系統維護中"
+docker compose exec laravel php artisan down --message="系統維護中"
 
 # 4. 清理快取和會話
-docker-compose exec laravel php artisan cache:clear
-docker-compose exec laravel php artisan session:flush
+docker compose exec laravel php artisan cache:clear
+docker compose exec laravel php artisan session:flush
 
 # 5. 重啟服務
-docker-compose restart
+docker compose restart
 
 # 6. 關閉維護模式
-docker-compose exec laravel php artisan up
+docker compose exec laravel php artisan up
 ```
 
 ## 預防措施

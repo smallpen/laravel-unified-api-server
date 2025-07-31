@@ -7,7 +7,7 @@
 
 
   - 建立Laravel專案目錄結構
-  - 設定Docker容器配置檔案 (docker-compose.yml, Dockerfile)
+  - 設定Docker容器配置檔案 (docker compose.yml, Dockerfile)
   - 配置Nginx設定檔案
   - 建立基本的環境變數設定
   - _Requirements: 3.1, 3.2, 3.3_
@@ -283,7 +283,7 @@
 
 
 
-  - 優化Dockerfile和docker-compose.yml
+  - 優化Dockerfile和docker compose.yml
   - 配置Nginx反向代理和SSL支援
   - 設定資料庫和Redis容器
   - 建立環境變數管理機制

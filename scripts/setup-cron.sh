@@ -69,7 +69,7 @@ create_cron_jobs() {
 0 5 * * 0 cd $PROJECT_ROOT && find ./backups -type d -name "backup_*" -mtime +30 -exec rm -rf {} \; >> ./logs/cron.log 2>&1
 
 # 每月 1 號凌晨 6 點執行資料庫優化
-0 6 1 * * cd $PROJECT_ROOT && docker-compose -f docker-compose.prod.yml exec -T database mysql -u root -p"\$MYSQL_ROOT_PASSWORD" -e "OPTIMIZE TABLE api_tokens, api_logs, action_permissions;" >> ./logs/cron.log 2>&1
+0 6 1 * * cd $PROJECT_ROOT && docker compose -f docker compose.prod.yml exec -T database mysql -u root -p"\$MYSQL_ROOT_PASSWORD" -e "OPTIMIZE TABLE api_tokens, api_logs, action_permissions;" >> ./logs/cron.log 2>&1
 
 # 每天檢查 SSL 憑證有效期 (如果使用 HTTPS)
 0 7 * * * cd $PROJECT_ROOT && ./scripts/check-ssl.sh >> ./logs/cron.log 2>&1

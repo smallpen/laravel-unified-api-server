@@ -45,8 +45,9 @@ check_requirements() {
         exit 1
     fi
     
-    if ! command -v docker-compose &> /dev/null; then
+    if ! docker compose version &> /dev/null; then
         echo "錯誤: Docker Compose未安裝或不在PATH中"
+        echo "請確保已安裝 Docker Desktop 或 Docker Engine with Compose plugin"
         exit 1
     fi
 }

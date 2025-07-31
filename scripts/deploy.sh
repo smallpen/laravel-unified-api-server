@@ -32,7 +32,7 @@ log_error() {
 
 # 配置變數
 PROJECT_NAME="laravel-unified-api-server"
-DOCKER_COMPOSE_FILE="docker-compose.prod.yml"
+DOCKER_COMPOSE_FILE="docker compose.prod.yml"
 BACKUP_DIR="./backups"
 LOG_DIR="./logs"
 
@@ -47,7 +47,7 @@ check_requirements() {
     fi
     
     # 檢查 Docker Compose
-    if ! command -v docker-compose &> /dev/null; then
+    if ! command -v docker compose &> /dev/null; then
         log_error "Docker Compose 未安裝，請先安裝 Docker Compose"
         exit 1
     fi
@@ -88,9 +88,9 @@ backup_data() {
     mkdir -p "$BACKUP_PATH"
     
     # 備份資料庫
-    if docker-compose -f "$DOCKER_COMPOSE_FILE" ps | grep -q "database"; then
+    if docker compose -f "$DOCKER_COMPOSE_FILE" ps | grep -q "database"; then
         log_info "備份資料庫..."
-        docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T database mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" > "$BACKUP_PATH/database.sql"
+        docker compose -f "$DOCKER_COMPOSE_FILE" exec -T database mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" > "$BACKUP_PATH/database.sql"
         log_success "資料庫備份完成"
     fi
     
@@ -121,7 +121,7 @@ pull_latest_code() {
 build_images() {
     log_info "建置 Docker 映像..."
     
-    docker-compose -f "$DOCKER_COMPOSE_FILE" build --no-cache
+    docker compose -f "$DOCKER_COMPOSE_FILE" build --no-cache
     
     log_success "Docker 映像建置完成"
 }
@@ -130,7 +130,7 @@ build_images() {
 stop_services() {
     log_info "停止現有服務..."
     
-    docker-compose -f "$DOCKER_COMPOSE_FILE" down
+    docker compose -f "$DOCKER_COMPOSE_FILE" down
     
     log_success "服務停止完成"
 }
@@ -139,7 +139,7 @@ stop_services() {
 start_services() {
     log_info "啟動服務..."
     
-    docker-compose -f "$DOCKER_COMPOSE_FILE" up -d
+    docker compose -f "$DOCKER_COMPOSE_FILE" up -d
     
     log_success "服務啟動完成"
 }
@@ -151,7 +151,7 @@ run_migrations() {
     # 等待資料庫啟動
     sleep 10
     
-    docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel php artisan migrate --force
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel php artisan migrate --force
     
     log_success "資料庫遷移完成"
 }
@@ -160,10 +160,10 @@ run_migrations() {
 clear_cache() {
     log_info "清除應用程式快取..."
     
-    docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel php artisan config:clear
-    docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel php artisan route:clear
-    docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel php artisan view:clear
-    docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel php artisan cache:clear
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel php artisan config:clear
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel php artisan route:clear
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel php artisan view:clear
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel php artisan cache:clear
     
     log_success "快取清除完成"
 }
@@ -172,8 +172,8 @@ clear_cache() {
 set_permissions() {
     log_info "設定檔案權限..."
     
-    docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel chown -R www-data:www-data /var/www/html/storage
-    docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel chmod -R 775 /var/www/html/storage
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel chown -R www-data:www-data /var/www/html/storage
+    docker compose -f "$DOCKER_COMPOSE_FILE" exec -T laravel chmod -R 775 /var/www/html/storage
     
     log_success "檔案權限設定完成"
 }
@@ -183,7 +183,7 @@ health_check() {
     log_info "執行健康檢查..."
     
     # 檢查服務狀態
-    if ! docker-compose -f "$DOCKER_COMPOSE_FILE" ps | grep -q "Up"; then
+    if ! docker compose -f "$DOCKER_COMPOSE_FILE" ps | grep -q "Up"; then
         log_error "服務未正常啟動"
         return 1
     fi
@@ -233,7 +233,7 @@ main() {
         cleanup_old_backups
         log_success "部署完成！"
         log_info "服務狀態："
-        docker-compose -f "$DOCKER_COMPOSE_FILE" ps
+        docker compose -f "$DOCKER_COMPOSE_FILE" ps
     else
         log_error "部署失敗，請檢查日誌"
         exit 1
@@ -256,12 +256,12 @@ show_usage() {
 
 # 顯示服務日誌
 show_logs() {
-    docker-compose -f "$DOCKER_COMPOSE_FILE" logs -f --tail=100
+    docker compose -f "$DOCKER_COMPOSE_FILE" logs -f --tail=100
 }
 
 # 顯示服務狀態
 show_status() {
-    docker-compose -f "$DOCKER_COMPOSE_FILE" ps
+    docker compose -f "$DOCKER_COMPOSE_FILE" ps
 }
 
 # 處理命令列參數

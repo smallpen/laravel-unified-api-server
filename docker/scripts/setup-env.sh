@@ -27,8 +27,8 @@ if ! grep -q "APP_KEY=base64:" "$ENV_FILE"; then
         php artisan key:generate
     else
         # 在主機上執行
-        if command -v docker-compose &> /dev/null; then
-            docker-compose exec laravel php artisan key:generate
+        if command -v docker compose &> /dev/null; then
+            docker compose exec laravel php artisan key:generate
         else
             echo "警告: 無法生成APP_KEY，請手動執行 'php artisan key:generate'"
         fi

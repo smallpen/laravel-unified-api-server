@@ -84,30 +84,30 @@ API_DOCUMENTATION_ENABLED=true
 
 ```bash
 # 建立並啟動容器
-docker-compose up -d
+docker compose up -d
 
 # 安裝PHP依賴
-docker-compose exec laravel composer install
+docker compose exec laravel composer install
 
 # 生成應用程式金鑰
-docker-compose exec laravel php artisan key:generate
+docker compose exec laravel php artisan key:generate
 
 # 執行資料庫遷移
-docker-compose exec laravel php artisan migrate
+docker compose exec laravel php artisan migrate
 
 # 建立儲存連結
-docker-compose exec laravel php artisan storage:link
+docker compose exec laravel php artisan storage:link
 
 # 清除快取
-docker-compose exec laravel php artisan config:clear
-docker-compose exec laravel php artisan cache:clear
+docker compose exec laravel php artisan config:clear
+docker compose exec laravel php artisan cache:clear
 ```
 
 ### 4. 驗證安裝
 
 ```bash
 # 檢查容器狀態
-docker-compose ps
+docker compose ps
 
 # 測試API端點
 curl -X POST http://localhost:8000/api/ \
@@ -137,8 +137,8 @@ sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 
 # 安裝Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker compose
+sudo chmod +x /usr/local/bin/docker compose
 
 # 重新登入以套用Docker群組權限
 logout
@@ -162,8 +162,8 @@ sudo systemctl enable docker
 sudo usermod -aG docker $USER
 
 # 安裝Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker compose
+sudo chmod +x /usr/local/bin/docker compose
 ```
 
 ### 2. 部署腳本
@@ -189,7 +189,7 @@ log() {
 backup_database() {
     log "建立資料庫備份..."
     mkdir -p $BACKUP_DIR
-    docker-compose exec -T database mysqldump -u root -psecret api_server > $BACKUP_DIR/db_backup_$(date +%Y%m%d_%H%M%S).sql
+    docker compose exec -T database mysqldump -u root -psecret api_server > $BACKUP_DIR/db_backup_$(date +%Y%m%d_%H%M%S).sql
 }
 
 # 部署主要流程
@@ -208,32 +208,32 @@ deploy() {
     
     # 停止服務
     log "停止現有服務..."
-    docker-compose down
+    docker compose down
     
     # 重建映像檔
     log "重建Docker映像檔..."
-    docker-compose build --no-cache
+    docker compose build --no-cache
     
     # 啟動服務
     log "啟動服務..."
-    docker-compose up -d
+    docker compose up -d
     
     # 等待服務啟動
     sleep 30
     
     # 執行遷移
     log "執行資料庫遷移..."
-    docker-compose exec -T laravel php artisan migrate --force
+    docker compose exec -T laravel php artisan migrate --force
     
     # 清除快取
     log "清除快取..."
-    docker-compose exec -T laravel php artisan config:cache
-    docker-compose exec -T laravel php artisan route:cache
-    docker-compose exec -T laravel php artisan view:cache
+    docker compose exec -T laravel php artisan config:cache
+    docker compose exec -T laravel php artisan route:cache
+    docker compose exec -T laravel php artisan view:cache
     
     # 重新啟動服務
     log "重新啟動服務..."
-    docker-compose restart
+    docker compose restart
     
     # 健康檢查
     log "執行健康檢查..."
@@ -301,7 +301,7 @@ MAIL_ENCRYPTION=tls
 
 #### Docker Compose生產設定
 
-建立 `docker-compose.prod.yml`：
+建立 `docker compose.prod.yml`：
 
 ```yaml
 version: '3.8'
@@ -678,7 +678,7 @@ sudo crontab -e
     notifempty
     create 644 www-data www-data
     postrotate
-        docker-compose exec laravel php artisan queue:restart
+        docker compose exec laravel php artisan queue:restart
     endscript
 }
 ```
@@ -724,7 +724,7 @@ BACKUP_FILE="$BACKUP_DIR/db_backup_$DATE.sql"
 mkdir -p $BACKUP_DIR
 
 # 執行備份
-docker-compose exec -T database mysqldump \
+docker compose exec -T database mysqldump \
     -u root -psecret \
     --single-transaction \
     --routines \
@@ -746,7 +746,7 @@ echo "資料庫備份完成: ${BACKUP_FILE}.gz"
 #!/bin/bash
 
 # 資料庫優化腳本
-docker-compose exec database mysql -u root -psecret -e "
+docker compose exec database mysql -u root -psecret -e "
 USE api_server_prod;
 
 -- 優化表格
@@ -840,12 +840,12 @@ sudo apt update && sudo apt upgrade -y
 
 # 更新Docker映像檔
 log "更新Docker映像檔..."
-docker-compose pull
+docker compose pull
 
 # 重建並重啟服務
 log "重建服務..."
-docker-compose down
-docker-compose up -d --build
+docker compose down
+docker compose up -d --build
 
 # 檢查服務狀態
 sleep 30
@@ -892,28 +892,28 @@ mail -s "安全掃描報告" admin@your-domain.com < $SCAN_REPORT
 
 ```bash
 # 檢查容器日誌
-docker-compose logs laravel
+docker compose logs laravel
 
 # 檢查容器狀態
-docker-compose ps
+docker compose ps
 
 # 重建容器
-docker-compose down
-docker-compose up -d --build
+docker compose down
+docker compose up -d --build
 ```
 
 #### 2. 資料庫連線失敗
 
 ```bash
 # 檢查資料庫容器
-docker-compose logs database
+docker compose logs database
 
 # 測試資料庫連線
-docker-compose exec laravel php artisan tinker
+docker compose exec laravel php artisan tinker
 >>> DB::connection()->getPdo();
 
 # 重啟資料庫服務
-docker-compose restart database
+docker compose restart database
 ```
 
 #### 3. API回應緩慢
@@ -923,13 +923,13 @@ docker-compose restart database
 docker stats
 
 # 檢查慢查詢日誌
-docker-compose exec database mysql -u root -psecret -e "
+docker compose exec database mysql -u root -psecret -e "
 SELECT * FROM mysql.slow_log ORDER BY start_time DESC LIMIT 10;
 "
 
 # 清除應用程式快取
-docker-compose exec laravel php artisan cache:clear
-docker-compose exec laravel php artisan config:clear
+docker compose exec laravel php artisan cache:clear
+docker compose exec laravel php artisan config:clear
 ```
 
 #### 4. 記憶體不足
@@ -939,7 +939,7 @@ docker-compose exec laravel php artisan config:clear
 free -h
 
 # 重啟服務釋放記憶體
-docker-compose restart
+docker compose restart
 
 # 調整PHP記憶體限制
 # 編輯 docker/php/php.ini
@@ -953,8 +953,8 @@ memory_limit = 512M
 ```bash
 # 緊急重啟所有服務
 cd /var/www/laravel-unified-api-server
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 
 # 如果仍有問題，使用備份恢復
 ./scripts/restore_backup.sh /var/backups/api-server/latest_backup.sql.gz
@@ -964,10 +964,10 @@ docker-compose up -d
 
 ```bash
 # 停止應用程式
-docker-compose stop laravel
+docker compose stop laravel
 
 # 修復資料庫
-docker-compose exec database mysql -u root -psecret -e "
+docker compose exec database mysql -u root -psecret -e "
 USE api_server_prod;
 REPAIR TABLE users;
 REPAIR TABLE api_tokens;

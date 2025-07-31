@@ -33,7 +33,7 @@ Laravel 統一 API Server 是一個基於 Docker 容器化部署的 API 服務�
 - 應用程式代碼：`/var/www/html`
 - 日誌檔案：`/var/www/html/storage/logs`
 - 配置檔案：`/var/www/html/config`
-- Docker 配置：`docker-compose.prod.yml`
+- Docker 配置：`docker compose.prod.yml`
 
 ## 日常維護任務
 
@@ -53,7 +53,7 @@ Laravel 統一 API Server 是一個基於 Docker 容器化部署的 API 服務�
 ./scripts/monitor.sh health
 
 # 檢查容器狀態
-docker-compose -f docker-compose.prod.yml ps
+docker compose -f docker compose.prod.yml ps
 
 # 檢查磁碟使用率
 df -h
@@ -86,7 +86,7 @@ find storage/logs -name "*.log" -mtime +30 -delete
 ls -la ./backups/
 
 # 更新 Composer 依賴
-docker-compose -f docker-compose.prod.yml exec laravel composer update --no-dev
+docker compose -f docker compose.prod.yml exec laravel composer update --no-dev
 ```
 
 ### 每月維護任務
@@ -104,7 +104,7 @@ docker-compose -f docker-compose.prod.yml exec laravel composer update --no-dev
 ./scripts/deploy.sh backup
 
 # 資料庫優化
-docker-compose -f docker-compose.prod.yml exec database mysql -u root -p -e "OPTIMIZE TABLE api_tokens, api_logs, action_permissions;"
+docker compose -f docker compose.prod.yml exec database mysql -u root -p -e "OPTIMIZE TABLE api_tokens, api_logs, action_permissions;"
 
 # 效能測試
 ./scripts/load-test.php
@@ -171,20 +171,20 @@ SLACK_WEBHOOK="https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
 ./scripts/deploy.sh backup
 
 # 僅備份資料庫
-docker-compose -f docker-compose.prod.yml exec database mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" > backup_$(date +%Y%m%d_%H%M%S).sql
+docker compose -f docker compose.prod.yml exec database mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" > backup_$(date +%Y%m%d_%H%M%S).sql
 ```
 
 ### 恢復程序
 
 1. **停止服務**
    ```bash
-   docker-compose -f docker-compose.prod.yml down
+   docker compose -f docker compose.prod.yml down
    ```
 
 2. **恢復資料庫**
    ```bash
-   docker-compose -f docker-compose.prod.yml up -d database
-   docker-compose -f docker-compose.prod.yml exec database mysql -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < backup_file.sql
+   docker compose -f docker compose.prod.yml up -d database
+   docker compose -f docker compose.prod.yml exec database mysql -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < backup_file.sql
    ```
 
 3. **恢復檔案**
@@ -194,7 +194,7 @@ docker-compose -f docker-compose.prod.yml exec database mysqldump -u root -p"$MY
 
 4. **重啟服務**
    ```bash
-   docker-compose -f docker-compose.prod.yml up -d
+   docker compose -f docker compose.prod.yml up -d
    ```
 
 ## 效能優化
@@ -203,44 +203,44 @@ docker-compose -f docker-compose.prod.yml exec database mysqldump -u root -p"$MY
 
 1. **定期優化表格**
    ```bash
-   docker-compose -f docker-compose.prod.yml exec database mysql -u root -p -e "OPTIMIZE TABLE api_tokens, api_logs, action_permissions;"
+   docker compose -f docker compose.prod.yml exec database mysql -u root -p -e "OPTIMIZE TABLE api_tokens, api_logs, action_permissions;"
    ```
 
 2. **檢查慢查詢**
    ```bash
-   docker-compose -f docker-compose.prod.yml exec database mysql -u root -p -e "SHOW PROCESSLIST;"
+   docker compose -f docker compose.prod.yml exec database mysql -u root -p -e "SHOW PROCESSLIST;"
    ```
 
 3. **分析表格使用情況**
    ```bash
-   docker-compose -f docker-compose.prod.yml exec database mysql -u root -p -e "SELECT table_name, table_rows, data_length, index_length FROM information_schema.tables WHERE table_schema='$MYSQL_DATABASE';"
+   docker compose -f docker compose.prod.yml exec database mysql -u root -p -e "SELECT table_name, table_rows, data_length, index_length FROM information_schema.tables WHERE table_schema='$MYSQL_DATABASE';"
    ```
 
 ### 快取優化
 
 1. **清除應用程式快取**
    ```bash
-   docker-compose -f docker-compose.prod.yml exec laravel php artisan cache:clear
-   docker-compose -f docker-compose.prod.yml exec laravel php artisan config:clear
-   docker-compose -f docker-compose.prod.yml exec laravel php artisan route:clear
+   docker compose -f docker compose.prod.yml exec laravel php artisan cache:clear
+   docker compose -f docker compose.prod.yml exec laravel php artisan config:clear
+   docker compose -f docker compose.prod.yml exec laravel php artisan route:clear
    ```
 
 2. **重建快取**
    ```bash
-   docker-compose -f docker-compose.prod.yml exec laravel php artisan config:cache
-   docker-compose -f docker-compose.prod.yml exec laravel php artisan route:cache
+   docker compose -f docker compose.prod.yml exec laravel php artisan config:cache
+   docker compose -f docker compose.prod.yml exec laravel php artisan route:cache
    ```
 
 3. **檢查 Redis 狀態**
    ```bash
-   docker-compose -f docker-compose.prod.yml exec redis redis-cli info memory
+   docker compose -f docker compose.prod.yml exec redis redis-cli info memory
    ```
 
 ### 檔案系統優化
 
 1. **清理暫存檔案**
    ```bash
-   docker-compose -f docker-compose.prod.yml exec laravel find /tmp -type f -atime +7 -delete
+   docker compose -f docker compose.prod.yml exec laravel find /tmp -type f -atime +7 -delete
    ```
 
 2. **壓縮日誌檔案**
@@ -254,18 +254,18 @@ docker-compose -f docker-compose.prod.yml exec database mysqldump -u root -p"$MY
 
 #### 1. 容器無法啟動
 
-**症狀**：`docker-compose up` 失敗
+**症狀**：`docker compose up` 失敗
 
 **診斷**：
 ```bash
-docker-compose -f docker-compose.prod.yml logs
+docker compose -f docker compose.prod.yml logs
 ```
 
 **解決方案**：
 - 檢查 `.env` 檔案配置
 - 檢查埠號衝突
 - 檢查磁碟空間
-- 重建映像：`docker-compose -f docker-compose.prod.yml build --no-cache`
+- 重建映像：`docker compose -f docker compose.prod.yml build --no-cache`
 
 #### 2. API 回應緩慢
 
@@ -277,10 +277,10 @@ docker-compose -f docker-compose.prod.yml logs
 ./scripts/monitor.sh resources
 
 # 檢查資料庫連線
-docker-compose -f docker-compose.prod.yml exec database mysql -u root -p -e "SHOW PROCESSLIST;"
+docker compose -f docker compose.prod.yml exec database mysql -u root -p -e "SHOW PROCESSLIST;"
 
 # 檢查 Redis 狀態
-docker-compose -f docker-compose.prod.yml exec redis redis-cli info
+docker compose -f docker compose.prod.yml exec redis redis-cli info
 ```
 
 **解決方案**：
@@ -295,7 +295,7 @@ docker-compose -f docker-compose.prod.yml exec redis redis-cli info
 
 **診斷**：
 ```bash
-docker-compose -f docker-compose.prod.yml exec laravel php artisan tinker
+docker compose -f docker compose.prod.yml exec laravel php artisan tinker
 # 在 tinker 中執行：DB::select('SELECT 1');
 ```
 
@@ -356,13 +356,13 @@ docker stats
 
 2. **更新 Docker 映像**
    ```bash
-   docker-compose -f docker-compose.prod.yml pull
-   docker-compose -f docker-compose.prod.yml up -d
+   docker compose -f docker compose.prod.yml pull
+   docker compose -f docker compose.prod.yml up -d
    ```
 
 3. **更新 Laravel 依賴**
    ```bash
-   docker-compose -f docker-compose.prod.yml exec laravel composer update --no-dev
+   docker compose -f docker compose.prod.yml exec laravel composer update --no-dev
    ```
 
 ### 安全監控
@@ -447,7 +447,7 @@ sudo logrotate -d /etc/logrotate.d/laravel-api
    curl -s http://localhost/api/health/detailed
    
    # 檢查服務狀態
-   docker-compose -f docker-compose.prod.yml ps
+   docker compose -f docker compose.prod.yml ps
    ```
 
 ### 回滾程序
@@ -456,7 +456,7 @@ sudo logrotate -d /etc/logrotate.d/laravel-api
 
 1. **停止服務**
    ```bash
-   docker-compose -f docker-compose.prod.yml down
+   docker compose -f docker compose.prod.yml down
    ```
 
 2. **恢復代碼**
@@ -467,13 +467,13 @@ sudo logrotate -d /etc/logrotate.d/laravel-api
 3. **恢復資料庫**
    ```bash
    # 使用最新的備份恢復
-   docker-compose -f docker-compose.prod.yml up -d database
-   docker-compose -f docker-compose.prod.yml exec database mysql -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < ./backups/latest/database.sql
+   docker compose -f docker compose.prod.yml up -d database
+   docker compose -f docker compose.prod.yml exec database mysql -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE" < ./backups/latest/database.sql
    ```
 
 4. **重啟服務**
    ```bash
-   docker-compose -f docker-compose.prod.yml up -d
+   docker compose -f docker compose.prod.yml up -d
    ```
 
 ## 緊急處理程序
@@ -488,7 +488,7 @@ sudo logrotate -d /etc/logrotate.d/laravel-api
 2. **診斷步驟**
    ```bash
    # 檢查容器狀態
-   docker-compose -f docker-compose.prod.yml ps
+   docker compose -f docker compose.prod.yml ps
    
    # 檢查系統資源
    top
@@ -505,30 +505,30 @@ sudo logrotate -d /etc/logrotate.d/laravel-api
 3. **恢復步驟**
    ```bash
    # 重啟服務
-   docker-compose -f docker-compose.prod.yml restart
+   docker compose -f docker compose.prod.yml restart
    
    # 如果無效，重建服務
-   docker-compose -f docker-compose.prod.yml down
-   docker-compose -f docker-compose.prod.yml up -d
+   docker compose -f docker compose.prod.yml down
+   docker compose -f docker compose.prod.yml up -d
    
    # 最後手段：完整重建
-   docker-compose -f docker-compose.prod.yml down -v
-   docker-compose -f docker-compose.prod.yml build --no-cache
-   docker-compose -f docker-compose.prod.yml up -d
+   docker compose -f docker compose.prod.yml down -v
+   docker compose -f docker compose.prod.yml build --no-cache
+   docker compose -f docker compose.prod.yml up -d
    ```
 
 ### 資料損壞處理
 
 1. **立即停止服務**
    ```bash
-   docker-compose -f docker-compose.prod.yml down
+   docker compose -f docker compose.prod.yml down
    ```
 
 2. **評估損壞程度**
    ```bash
    # 檢查資料庫完整性
-   docker-compose -f docker-compose.prod.yml up -d database
-   docker-compose -f docker-compose.prod.yml exec database mysql -u root -p -e "CHECK TABLE api_tokens, api_logs, action_permissions;"
+   docker compose -f docker compose.prod.yml up -d database
+   docker compose -f docker compose.prod.yml exec database mysql -u root -p -e "CHECK TABLE api_tokens, api_logs, action_permissions;"
    ```
 
 3. **恢復資料**
@@ -543,7 +543,7 @@ sudo logrotate -d /etc/logrotate.d/laravel-api
 1. **隔離系統**
    ```bash
    # 停止對外服務
-   docker-compose -f docker-compose.prod.yml stop nginx
+   docker compose -f docker compose.prod.yml stop nginx
    ```
 
 2. **收集證據**

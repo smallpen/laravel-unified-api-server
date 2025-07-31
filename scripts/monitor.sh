@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 
 # 配置變數
 PROJECT_NAME="laravel-unified-api-server"
-DOCKER_COMPOSE_FILE="docker-compose.prod.yml"
+DOCKER_COMPOSE_FILE="docker compose.prod.yml"
 HEALTH_CHECK_URL="http://localhost/api/health/detailed"
 LOG_DIR="./logs"
 ALERT_EMAIL=""
@@ -49,7 +49,7 @@ check_containers() {
     local failed_containers=()
     
     for container in "${containers[@]}"; do
-        if ! docker-compose -f "$DOCKER_COMPOSE_FILE" ps "$container" | grep -q "Up"; then
+        if ! docker compose -f "$DOCKER_COMPOSE_FILE" ps "$container" | grep -q "Up"; then
             failed_containers+=("$container")
             log_error "容器 $container 未正常運行"
         else
@@ -149,7 +149,7 @@ check_logs() {
 check_database() {
     log_info "檢查資料庫連線..."
     
-    if docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T database mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1;" > /dev/null 2>&1; then
+    if docker compose -f "$DOCKER_COMPOSE_FILE" exec -T database mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1;" > /dev/null 2>&1; then
         log_success "資料庫連線正常"
         return 0
     else
@@ -163,7 +163,7 @@ check_database() {
 check_redis() {
     log_info "檢查 Redis 連線..."
     
-    if docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T redis redis-cli ping | grep -q "PONG"; then
+    if docker compose -f "$DOCKER_COMPOSE_FILE" exec -T redis redis-cli ping | grep -q "PONG"; then
         log_success "Redis 連線正常"
         return 0
     else
@@ -213,7 +213,7 @@ generate_report() {
         echo ""
         
         echo "容器狀態:"
-        docker-compose -f "$DOCKER_COMPOSE_FILE" ps
+        docker compose -f "$DOCKER_COMPOSE_FILE" ps
         echo ""
         
         echo "系統資源使用率:"
@@ -246,12 +246,12 @@ auto_repair() {
     local containers=("nginx" "laravel" "database" "redis")
     
     for container in "${containers[@]}"; do
-        if ! docker-compose -f "$DOCKER_COMPOSE_FILE" ps "$container" | grep -q "Up"; then
+        if ! docker compose -f "$DOCKER_COMPOSE_FILE" ps "$container" | grep -q "Up"; then
             log_warning "嘗試重啟容器: $container"
-            docker-compose -f "$DOCKER_COMPOSE_FILE" restart "$container"
+            docker compose -f "$DOCKER_COMPOSE_FILE" restart "$container"
             sleep 10
             
-            if docker-compose -f "$DOCKER_COMPOSE_FILE" ps "$container" | grep -q "Up"; then
+            if docker compose -f "$DOCKER_COMPOSE_FILE" ps "$container" | grep -q "Up"; then
                 log_success "容器 $container 重啟成功"
             else
                 log_error "容器 $container 重啟失敗"

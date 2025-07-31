@@ -18,7 +18,7 @@ fi
 # 檢查必要檔案
 echo ""
 echo "檢查必要檔案..."
-required_files=("docker-compose.yml" "Dockerfile" ".env")
+required_files=("docker compose.yml" "Dockerfile" ".env")
 for file in "${required_files[@]}"; do
     if [ -f "$file" ]; then
         echo "✓ $file 存在"

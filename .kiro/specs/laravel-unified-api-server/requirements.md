@@ -33,7 +33,7 @@
 
 #### Acceptance Criteria
 
-1. WHEN 執行docker-compose up THEN 系統 SHALL 啟動Laravel應用程式、Nginx和相關服務
+1. WHEN 執行docker compose up THEN 系統 SHALL 啟動Laravel應用程式、Nginx和相關服務
 2. WHEN 容器啟動完成 THEN Nginx SHALL 正確代理請求到Laravel應用程式
 3. WHEN 系統重啟 THEN 所有服務 SHALL 自動恢復運行狀態
 4. WHEN 需要擴展 THEN 系統 SHALL 支援水平擴展部署

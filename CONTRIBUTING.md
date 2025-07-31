@@ -122,14 +122,14 @@ cp .env.example .env
 
 4. **安裝依賴**
 ```bash
-docker-compose exec laravel composer install
-docker-compose exec laravel php artisan key:generate
-docker-compose exec laravel php artisan migrate
+docker compose exec laravel composer install
+docker compose exec laravel php artisan key:generate
+docker compose exec laravel php artisan migrate
 ```
 
 5. **執行測試**
 ```bash
-docker-compose exec laravel php artisan test
+docker compose exec laravel php artisan test
 ```
 
 ## 提交指南
@@ -228,13 +228,13 @@ feat(auth): add Bearer token validation
 
 ```bash
 # 程式碼格式檢查
-docker-compose exec laravel ./vendor/bin/php-cs-fixer fix --dry-run
+docker compose exec laravel ./vendor/bin/php-cs-fixer fix --dry-run
 
 # 程式碼格式修正
-docker-compose exec laravel ./vendor/bin/php-cs-fixer fix
+docker compose exec laravel ./vendor/bin/php-cs-fixer fix
 
 # 靜態分析
-docker-compose exec laravel ./vendor/bin/phpstan analyse
+docker compose exec laravel ./vendor/bin/phpstan analyse
 ```
 
 ## 測試要求
@@ -255,13 +255,13 @@ docker-compose exec laravel ./vendor/bin/phpstan analyse
 
 ```bash
 # 執行所有測試
-docker-compose exec laravel php artisan test
+docker compose exec laravel php artisan test
 
 # 執行特定測試套件
-docker-compose exec laravel php artisan test --testsuite=Unit
+docker compose exec laravel php artisan test --testsuite=Unit
 
 # 生成覆蓋率報告
-docker-compose exec laravel php artisan test --coverage
+docker compose exec laravel php artisan test --coverage
 ```
 
 ### 測試命名規範

@@ -22,19 +22,19 @@ mkdir -p "$BACKUP_DIR/$BACKUP_NAME"
 # 備份資料庫
 echo "備份資料庫..."
 if [ "$ENVIRONMENT" = "production" ]; then
-    docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec -T database mysqldump -u root -p"${DB_ROOT_PASSWORD:-root_password}" --all-databases > "$BACKUP_DIR/$BACKUP_NAME/database.sql"
+    docker compose -f docker compose.yml -f docker compose.prod.yml exec -T database mysqldump -u root -p"${DB_ROOT_PASSWORD:-root_password}" --all-databases > "$BACKUP_DIR/$BACKUP_NAME/database.sql"
 else
-    docker-compose exec -T database mysqldump -u root -p"${DB_ROOT_PASSWORD:-root_password}" --all-databases > "$BACKUP_DIR/$BACKUP_NAME/database.sql"
+    docker compose exec -T database mysqldump -u root -p"${DB_ROOT_PASSWORD:-root_password}" --all-databases > "$BACKUP_DIR/$BACKUP_NAME/database.sql"
 fi
 
 # 備份Redis資料
 echo "備份Redis資料..."
 if [ "$ENVIRONMENT" = "production" ]; then
-    docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec -T redis redis-cli BGSAVE
+    docker compose -f docker compose.yml -f docker compose.prod.yml exec -T redis redis-cli BGSAVE
     sleep 5
     docker cp unified-api-redis:/data/dump.rdb "$BACKUP_DIR/$BACKUP_NAME/redis_dump.rdb"
 else
-    docker-compose exec -T redis redis-cli BGSAVE
+    docker compose exec -T redis redis-cli BGSAVE
     sleep 5
     docker cp unified-api-redis:/data/dump.rdb "$BACKUP_DIR/$BACKUP_NAME/redis_dump.rdb"
 fi
@@ -75,8 +75,8 @@ cat > "$BACKUP_DIR/$BACKUP_NAME/backup_info.txt" << EOF
 還原指令:
 1. 解壓應用程式檔案: tar -xzf app_files.tar.gz
 2. 還原環境設定: cp env_backup .env
-3. 還原資料庫: docker-compose exec -T database mysql -u root -p < database.sql
-4. 還原Redis: docker cp redis_dump.rdb unified-api-redis:/data/dump.rdb && docker-compose exec redis redis-cli DEBUG RESTART
+3. 還原資料庫: docker compose exec -T database mysql -u root -p < database.sql
+4. 還原Redis: docker cp redis_dump.rdb unified-api-redis:/data/dump.rdb && docker compose exec redis redis-cli DEBUG RESTART
 
 備份大小: $(du -sh "$BACKUP_DIR/$BACKUP_NAME" | cut -f1)
 EOF

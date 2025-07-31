@@ -42,7 +42,7 @@ check_docker_environment() {
         exit 1
     fi
     
-    if ! command -v docker-compose &> /dev/null; then
+    if ! command -v docker compose &> /dev/null; then
         log_error "Docker Compose未安裝或不在PATH中"
         exit 1
     fi
@@ -55,19 +55,19 @@ start_docker_services() {
     log_info "啟動Docker服務..."
     
     # 停止現有服務
-    docker-compose down --remove-orphans
+    docker compose down --remove-orphans
     
     # 建立並啟動服務
-    docker-compose up -d --build
+    docker compose up -d --build
     
     # 等待服務啟動
     log_info "等待服務啟動..."
     sleep 30
     
     # 檢查服務狀態
-    if ! docker-compose ps | grep -q "Up"; then
+    if ! docker compose ps | grep -q "Up"; then
         log_error "Docker服務啟動失敗"
-        docker-compose logs
+        docker compose logs
         exit 1
     fi
     
@@ -83,7 +83,7 @@ check_service_health() {
     attempt=1
     
     while [ $attempt -le $max_attempts ]; do
-        if docker-compose exec -T laravel php artisan tinker --execute="echo 'Laravel OK';" &> /dev/null; then
+        if docker compose exec -T laravel php artisan tinker --execute="echo 'Laravel OK';" &> /dev/null; then
             log_success "Laravel應用程式健康檢查通過"
             break
         fi
@@ -95,34 +95,34 @@ check_service_health() {
     
     if [ $attempt -gt $max_attempts ]; then
         log_error "Laravel應用程式健康檢查失敗"
-        docker-compose logs laravel
+        docker compose logs laravel
         exit 1
     fi
     
     # 檢查資料庫連線
-    if docker-compose exec -T laravel php artisan migrate:status &> /dev/null; then
+    if docker compose exec -T laravel php artisan migrate:status &> /dev/null; then
         log_success "資料庫連線健康檢查通過"
     else
         log_error "資料庫連線健康檢查失敗"
-        docker-compose logs database
+        docker compose logs database
         exit 1
     fi
     
     # 檢查Redis連線
-    if docker-compose exec -T redis redis-cli ping | grep -q "PONG"; then
+    if docker compose exec -T redis redis-cli ping | grep -q "PONG"; then
         log_success "Redis連線健康檢查通過"
     else
         log_error "Redis連線健康檢查失敗"
-        docker-compose logs redis
+        docker compose logs redis
         exit 1
     fi
     
     # 檢查Nginx
-    if docker-compose exec -T nginx nginx -t &> /dev/null; then
+    if docker compose exec -T nginx nginx -t &> /dev/null; then
         log_success "Nginx配置健康檢查通過"
     else
         log_error "Nginx配置健康檢查失敗"
-        docker-compose logs nginx
+        docker compose logs nginx
         exit 1
     fi
 }
@@ -132,17 +132,17 @@ prepare_test_environment() {
     log_info "準備測試環境..."
     
     # 執行資料庫遷移
-    docker-compose exec -T laravel php artisan migrate:fresh --force
+    docker compose exec -T laravel php artisan migrate:fresh --force
     
     # 清除快取
-    docker-compose exec -T laravel php artisan cache:clear
-    docker-compose exec -T laravel php artisan config:clear
-    docker-compose exec -T laravel php artisan route:clear
-    docker-compose exec -T laravel php artisan view:clear
+    docker compose exec -T laravel php artisan cache:clear
+    docker compose exec -T laravel php artisan config:clear
+    docker compose exec -T laravel php artisan route:clear
+    docker compose exec -T laravel php artisan view:clear
     
     # 重新載入配置
-    docker-compose exec -T laravel php artisan config:cache
-    docker-compose exec -T laravel php artisan route:cache
+    docker compose exec -T laravel php artisan config:cache
+    docker compose exec -T laravel php artisan route:cache
     
     log_success "測試環境準備完成"
 }
@@ -159,7 +159,7 @@ run_e2e_tests() {
     
     # 執行端到端系統測試
     log_info "執行EndToEndSystemTest..."
-    if docker-compose exec -T laravel php artisan test --testsuite=Feature --filter=EndToEndSystemTest --stop-on-failure; then
+    if docker compose exec -T laravel php artisan test --testsuite=Feature --filter=EndToEndSystemTest --stop-on-failure; then
         log_success "EndToEndSystemTest 執行成功"
     else
         log_error "EndToEndSystemTest 執行失敗"
@@ -168,7 +168,7 @@ run_e2e_tests() {
     
     # 執行完整API整合測試
     log_info "執行CompleteApiIntegrationTest..."
-    if docker-compose exec -T laravel php artisan test --testsuite=Feature --filter=CompleteApiIntegrationTest --stop-on-failure; then
+    if docker compose exec -T laravel php artisan test --testsuite=Feature --filter=CompleteApiIntegrationTest --stop-on-failure; then
         log_success "CompleteApiIntegrationTest 執行成功"
     else
         log_error "CompleteApiIntegrationTest 執行失敗"
@@ -177,7 +177,7 @@ run_e2e_tests() {
     
     # 執行綜合整合測試
     log_info "執行ComprehensiveIntegrationTest..."
-    if docker-compose exec -T laravel php artisan test --testsuite=Feature --filter=ComprehensiveIntegrationTest --stop-on-failure; then
+    if docker compose exec -T laravel php artisan test --testsuite=Feature --filter=ComprehensiveIntegrationTest --stop-on-failure; then
         log_success "ComprehensiveIntegrationTest 執行成功"
     else
         log_error "ComprehensiveIntegrationTest 執行失敗"
@@ -186,7 +186,7 @@ run_e2e_tests() {
     
     # 執行安全測試
     log_info "執行安全測試..."
-    if docker-compose exec -T laravel php artisan test --testsuite=Security --stop-on-failure; then
+    if docker compose exec -T laravel php artisan test --testsuite=Security --stop-on-failure; then
         log_success "安全測試執行成功"
     else
         log_error "安全測試執行失敗"
@@ -195,7 +195,7 @@ run_e2e_tests() {
     
     # 執行效能測試
     log_info "執行效能測試..."
-    if docker-compose exec -T laravel php artisan test --testsuite=Performance --stop-on-failure; then
+    if docker compose exec -T laravel php artisan test --testsuite=Performance --stop-on-failure; then
         log_success "效能測試執行成功"
     else
         log_error "效能測試執行失敗"
@@ -273,7 +273,7 @@ generate_test_report() {
 
 ## 服務狀態
 \`\`\`
-$(docker-compose ps)
+$(docker compose ps)
 \`\`\`
 
 ## 系統資源使用
@@ -284,22 +284,22 @@ $(docker stats --no-stream)
 ## 日誌摘要
 ### Laravel應用程式日誌
 \`\`\`
-$(docker-compose logs --tail=50 laravel)
+$(docker compose logs --tail=50 laravel)
 \`\`\`
 
 ### Nginx日誌
 \`\`\`
-$(docker-compose logs --tail=20 nginx)
+$(docker compose logs --tail=20 nginx)
 \`\`\`
 
 ### 資料庫日誌
 \`\`\`
-$(docker-compose logs --tail=20 database)
+$(docker compose logs --tail=20 database)
 \`\`\`
 
 ### Redis日誌
 \`\`\`
-$(docker-compose logs --tail=20 redis)
+$(docker compose logs --tail=20 redis)
 \`\`\`
 EOF
     
@@ -313,7 +313,7 @@ cleanup_environment() {
     if [ "$1" = "keep-running" ]; then
         log_info "保持Docker服務運行"
     else
-        docker-compose down --remove-orphans
+        docker compose down --remove-orphans
         log_success "Docker服務已停止"
     fi
 }
@@ -375,7 +375,7 @@ main() {
         log_info "API端點: http://localhost/api"
         log_info "API文件: http://localhost/api/docs"
         log_info "Swagger UI: http://localhost/api/docs/swagger"
-        log_info "停止服務: docker-compose down"
+        log_info "停止服務: docker compose down"
     else
         cleanup_environment
     fi

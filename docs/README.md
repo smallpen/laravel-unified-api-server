@@ -38,12 +38,12 @@ cd laravel-unified-api-server
 cp .env.example .env
 
 # 啟動Docker環境
-docker-compose up -d
+docker compose up -d
 
 # 安裝依賴和初始化
-docker-compose exec laravel composer install
-docker-compose exec laravel php artisan key:generate
-docker-compose exec laravel php artisan migrate
+docker compose exec laravel composer install
+docker compose exec laravel php artisan key:generate
+docker compose exec laravel php artisan migrate
 ```
 
 ### 2. 第一個API呼叫

@@ -271,7 +271,7 @@ class ActionPermission extends Model
 
 ## Docker配置設計
 
-### docker-compose.yml結構
+### docker compose.yml結構
 
 ```yaml
 version: '3.8'

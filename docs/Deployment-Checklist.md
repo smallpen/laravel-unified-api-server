@@ -6,7 +6,7 @@
 
 - [ ] 確認 Docker 和 Docker Compose 已安裝
 - [ ] 確認 `.env` 檔案已正確配置
-- [ ] 確認 `docker-compose.prod.yml` 檔案存在
+- [ ] 確認 `docker compose.prod.yml` 檔案存在
 - [ ] 確認所有必要的埠號未被佔用 (80, 443, 3306, 6379)
 - [ ] 確認磁碟空間充足 (至少 10GB 可用空間)
 
@@ -54,11 +54,11 @@
 
 - [ ] 確認所有容器正常啟動
   ```bash
-  docker-compose -f docker-compose.prod.yml ps
+  docker compose -f docker compose.prod.yml ps
   ```
 - [ ] 檢查容器日誌無錯誤
   ```bash
-  docker-compose -f docker-compose.prod.yml logs
+  docker compose -f docker compose.prod.yml logs
   ```
 
 ## 部署後驗證
@@ -188,7 +188,7 @@
 
 1. **立即停止部署**
    ```bash
-   docker-compose -f docker-compose.prod.yml down
+   docker compose -f docker compose.prod.yml down
    ```
 
 2. **評估問題嚴重性**

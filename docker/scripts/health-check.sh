@@ -11,9 +11,9 @@ echo "=== 統一API Server健康檢查 ==="
 # 檢查容器狀態
 echo "檢查容器狀態..."
 if [ "$ENVIRONMENT" = "production" ]; then
-    docker-compose -f docker-compose.yml -f docker-compose.prod.yml ps
+    docker compose -f docker compose.yml -f docker compose.prod.yml ps
 else
-    docker-compose ps
+    docker compose ps
 fi
 
 echo ""
@@ -56,13 +56,13 @@ echo ""
 # 檢查資料庫連線
 echo "檢查資料庫連線..."
 if [ "$ENVIRONMENT" = "production" ]; then
-    if docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec -T laravel php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database connection: OK';" 2>/dev/null; then
+    if docker compose -f docker compose.yml -f docker compose.prod.yml exec -T laravel php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database connection: OK';" 2>/dev/null; then
         echo "✓ 資料庫連線正常"
     else
         echo "✗ 資料庫連線失敗"
     fi
 else
-    if docker-compose exec -T laravel php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database connection: OK';" 2>/dev/null; then
+    if docker compose exec -T laravel php artisan tinker --execute="DB::connection()->getPdo(); echo 'Database connection: OK';" 2>/dev/null; then
         echo "✓ 資料庫連線正常"
     else
         echo "✗ 資料庫連線失敗"
@@ -72,13 +72,13 @@ fi
 # 檢查Redis連線
 echo "檢查Redis連線..."
 if [ "$ENVIRONMENT" = "production" ]; then
-    if docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec -T laravel php artisan tinker --execute="Redis::ping(); echo 'Redis connection: OK';" 2>/dev/null; then
+    if docker compose -f docker compose.yml -f docker compose.prod.yml exec -T laravel php artisan tinker --execute="Redis::ping(); echo 'Redis connection: OK';" 2>/dev/null; then
         echo "✓ Redis連線正常"
     else
         echo "✗ Redis連線失敗"
     fi
 else
-    if docker-compose exec -T laravel php artisan tinker --execute="Redis::ping(); echo 'Redis connection: OK';" 2>/dev/null; then
+    if docker compose exec -T laravel php artisan tinker --execute="Redis::ping(); echo 'Redis connection: OK';" 2>/dev/null; then
         echo "✓ Redis連線正常"
     else
         echo "✗ Redis連線失敗"
@@ -89,9 +89,9 @@ fi
 echo ""
 echo "檢查最近的錯誤日誌..."
 if [ "$ENVIRONMENT" = "production" ]; then
-    error_count=$(docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec -T laravel tail -n 100 storage/logs/laravel.log 2>/dev/null | grep -i error | wc -l || echo "0")
+    error_count=$(docker compose -f docker compose.yml -f docker compose.prod.yml exec -T laravel tail -n 100 storage/logs/laravel.log 2>/dev/null | grep -i error | wc -l || echo "0")
 else
-    error_count=$(docker-compose exec -T laravel tail -n 100 storage/logs/laravel.log 2>/dev/null | grep -i error | wc -l || echo "0")
+    error_count=$(docker compose exec -T laravel tail -n 100 storage/logs/laravel.log 2>/dev/null | grep -i error | wc -l || echo "0")
 fi
 
 if [ "$error_count" -eq 0 ]; then

@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 
 # 配置變數
 PROJECT_NAME="Laravel 統一 API Server"
-DOCKER_COMPOSE_FILE="docker-compose.prod.yml"
+DOCKER_COMPOSE_FILE="docker compose.prod.yml"
 HEALTH_CHECK_URL="http://localhost/api/health/detailed"
 
 # 清除螢幕
@@ -43,7 +43,7 @@ check_containers() {
     local all_healthy=true
     
     for container in "${containers[@]}"; do
-        if docker-compose -f "$DOCKER_COMPOSE_FILE" ps "$container" 2>/dev/null | grep -q "Up"; then
+        if docker compose -f "$DOCKER_COMPOSE_FILE" ps "$container" 2>/dev/null | grep -q "Up"; then
             echo -e "  ${GREEN}✓${NC} $container: 運行中"
         else
             echo -e "  ${RED}✗${NC} $container: 停止"
@@ -217,8 +217,8 @@ show_statistics() {
     echo -e "  ${CYAN}⏱${NC}  系統運行時間: $uptime_info"
     
     # Docker 容器運行時間
-    if docker-compose -f "$DOCKER_COMPOSE_FILE" ps laravel 2>/dev/null | grep -q "Up"; then
-        local container_uptime=$(docker-compose -f "$DOCKER_COMPOSE_FILE" ps laravel | grep "Up" | awk '{for(i=4;i<=NF;i++) printf "%s ", $i; print ""}')
+    if docker compose -f "$DOCKER_COMPOSE_FILE" ps laravel 2>/dev/null | grep -q "Up"; then
+        local container_uptime=$(docker compose -f "$DOCKER_COMPOSE_FILE" ps laravel | grep "Up" | awk '{for(i=4;i<=NF;i++) printf "%s ", $i; print ""}')
         echo -e "  ${CYAN}📦${NC} 容器運行時間: $container_uptime"
     fi
     
@@ -227,8 +227,8 @@ show_statistics() {
     echo -e "  ${CYAN}📄${NC} 日誌檔案大小: $log_size"
     
     # 資料庫大小 (如果可以連接)
-    if docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T database mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1;" &>/dev/null; then
-        local db_size=$(docker-compose -f "$DOCKER_COMPOSE_FILE" exec -T database mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) AS 'DB Size in MB' FROM information_schema.tables WHERE table_schema='$MYSQL_DATABASE';" 2>/dev/null | tail -1 || echo "未知")
+    if docker compose -f "$DOCKER_COMPOSE_FILE" exec -T database mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1;" &>/dev/null; then
+        local db_size=$(docker compose -f "$DOCKER_COMPOSE_FILE" exec -T database mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) AS 'DB Size in MB' FROM information_schema.tables WHERE table_schema='$MYSQL_DATABASE';" 2>/dev/null | tail -1 || echo "未知")
         echo -e "  ${CYAN}🗄${NC}  資料庫大小: ${db_size} MB"
     fi
     
@@ -260,14 +260,14 @@ handle_user_input() {
             ;;
         2)
             echo "檢視容器日誌..."
-            docker-compose -f "$DOCKER_COMPOSE_FILE" logs --tail=50
+            docker compose -f "$DOCKER_COMPOSE_FILE" logs --tail=50
             echo ""
             echo "按任意鍵繼續..."
             read -r
             ;;
         3)
             echo "重啟服務..."
-            docker-compose -f "$DOCKER_COMPOSE_FILE" restart
+            docker compose -f "$DOCKER_COMPOSE_FILE" restart
             echo "服務重啟完成"
             echo "按任意鍵繼續..."
             read -r

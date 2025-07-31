@@ -13,15 +13,15 @@ echo "=== 停止統一API Server (環境: $ENVIRONMENT) ==="
 echo "停止Docker容器..."
 if [ "$ENVIRONMENT" = "production" ]; then
     if [ "$REMOVE_VOLUMES" = "true" ]; then
-        docker-compose -f docker-compose.yml -f docker-compose.prod.yml down --volumes --remove-orphans
+        docker compose -f docker compose.yml -f docker compose.prod.yml down --volumes --remove-orphans
     else
-        docker-compose -f docker-compose.yml -f docker-compose.prod.yml down --remove-orphans
+        docker compose -f docker compose.yml -f docker compose.prod.yml down --remove-orphans
     fi
 else
     if [ "$REMOVE_VOLUMES" = "true" ]; then
-        docker-compose down --volumes --remove-orphans
+        docker compose down --volumes --remove-orphans
     else
-        docker-compose down --remove-orphans
+        docker compose down --remove-orphans
     fi
 fi
 

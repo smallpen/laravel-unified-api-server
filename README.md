@@ -47,16 +47,16 @@ cp .env.example .env
 # 使用管理腳本啟動
 ./manage.sh start
 
-# 或直接使用docker-compose
-docker-compose up -d
+# 或直接使用 docker compose
+docker compose up -d
 ```
 
 4. **安裝依賴並初始化**
 ```bash
-docker-compose exec laravel composer install
-docker-compose exec laravel php artisan key:generate
-docker-compose exec laravel php artisan migrate
-docker-compose exec laravel php artisan db:seed
+docker compose exec laravel composer install
+docker compose exec laravel php artisan key:generate
+docker compose exec laravel php artisan migrate
+docker compose exec laravel php artisan db:seed
 ```
 
 5. **測試API**
@@ -142,18 +142,18 @@ php artisan action:permissions set user.create --permissions=user.create
 ./manage.sh test
 
 # 執行特定測試套件
-docker-compose exec laravel php artisan test --testsuite=Unit
-docker-compose exec laravel php artisan test --testsuite=Feature
+docker compose exec laravel php artisan test --testsuite=Unit
+docker compose exec laravel php artisan test --testsuite=Feature
 ```
 
 ### 生成API文件
 
 ```bash
 # 生成API文件
-docker-compose exec laravel php artisan api:generate-docs
+docker compose exec laravel php artisan api:generate-docs
 
 # 驗證文件完整性
-docker-compose exec laravel php artisan api:generate-docs --validate
+docker compose exec laravel php artisan api:generate-docs --validate
 ```
 
 ## 📚 文件
@@ -196,10 +196,10 @@ docker-compose exec laravel php artisan api:generate-docs --validate
 
 ```bash
 # 執行所有測試
-docker-compose exec laravel php artisan test
+docker compose exec laravel php artisan test
 
 # 執行測試並生成覆蓋率報告
-docker-compose exec laravel php artisan test --coverage
+docker compose exec laravel php artisan test --coverage
 ```
 
 ## 📊 監控

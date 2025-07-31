@@ -15,15 +15,15 @@ echo ""
 if [ "$SERVICE" = "all" ]; then
     echo "顯示所有服務日誌..."
     if [ "$ENVIRONMENT" = "production" ]; then
-        docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs --tail="$LINES" -f
+        docker compose -f docker compose.yml -f docker compose.prod.yml logs --tail="$LINES" -f
     else
-        docker-compose logs --tail="$LINES" -f
+        docker compose logs --tail="$LINES" -f
     fi
 else
     echo "顯示 $SERVICE 服務日誌..."
     if [ "$ENVIRONMENT" = "production" ]; then
-        docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs --tail="$LINES" -f "$SERVICE"
+        docker compose -f docker compose.yml -f docker compose.prod.yml logs --tail="$LINES" -f "$SERVICE"
     else
-        docker-compose logs --tail="$LINES" -f "$SERVICE"
+        docker compose logs --tail="$LINES" -f "$SERVICE"
     fi
 fi

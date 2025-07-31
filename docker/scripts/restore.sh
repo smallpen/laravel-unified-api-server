@@ -86,9 +86,9 @@ sleep 30
 echo "還原資料庫..."
 if [ -f "$BACKUP_PATH/database.sql" ]; then
     if [ "$ENVIRONMENT" = "production" ]; then
-        docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec -T database mysql -u root -p"${DB_ROOT_PASSWORD:-root_password}" < "$BACKUP_PATH/database.sql"
+        docker compose -f docker compose.yml -f docker compose.prod.yml exec -T database mysql -u root -p"${DB_ROOT_PASSWORD:-root_password}" < "$BACKUP_PATH/database.sql"
     else
-        docker-compose exec -T database mysql -u root -p"${DB_ROOT_PASSWORD:-root_password}" < "$BACKUP_PATH/database.sql"
+        docker compose exec -T database mysql -u root -p"${DB_ROOT_PASSWORD:-root_password}" < "$BACKUP_PATH/database.sql"
     fi
     echo "✓ 資料庫還原完成"
 else
@@ -100,9 +100,9 @@ echo "還原Redis資料..."
 if [ -f "$BACKUP_PATH/redis_dump.rdb" ]; then
     # 停止Redis以安全地替換資料檔案
     if [ "$ENVIRONMENT" = "production" ]; then
-        docker-compose -f docker-compose.yml -f docker-compose.prod.yml stop redis
+        docker compose -f docker compose.yml -f docker compose.prod.yml stop redis
     else
-        docker-compose stop redis
+        docker compose stop redis
     fi
     
     # 複製Redis備份檔案
@@ -110,9 +110,9 @@ if [ -f "$BACKUP_PATH/redis_dump.rdb" ]; then
     
     # 重新啟動Redis
     if [ "$ENVIRONMENT" = "production" ]; then
-        docker-compose -f docker-compose.yml -f docker-compose.prod.yml start redis
+        docker compose -f docker compose.yml -f docker compose.prod.yml start redis
     else
-        docker-compose start redis
+        docker compose start redis
     fi
     
     echo "✓ Redis資料還原完成"
@@ -127,13 +127,13 @@ rm -rf "$TEMP_DIR"
 # 重新建立快取
 echo "重新建立快取..."
 if [ "$ENVIRONMENT" = "production" ]; then
-    docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec laravel php artisan config:cache
-    docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec laravel php artisan route:cache
-    docker-compose -f docker-compose.yml -f docker-compose.prod.yml exec laravel php artisan view:cache
+    docker compose -f docker compose.yml -f docker compose.prod.yml exec laravel php artisan config:cache
+    docker compose -f docker compose.yml -f docker compose.prod.yml exec laravel php artisan route:cache
+    docker compose -f docker compose.yml -f docker compose.prod.yml exec laravel php artisan view:cache
 else
-    docker-compose exec laravel php artisan config:cache
-    docker-compose exec laravel php artisan route:cache
-    docker-compose exec laravel php artisan view:cache
+    docker compose exec laravel php artisan config:cache
+    docker compose exec laravel php artisan route:cache
+    docker compose exec laravel php artisan view:cache
 fi
 
 echo ""

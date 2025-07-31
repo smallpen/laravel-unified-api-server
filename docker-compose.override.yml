@@ -1,5 +1,5 @@
 # Docker Compose開發環境覆蓋設定
-# 此檔案會自動與docker-compose.yml合併
+# 此檔案會自動與docker compose.yml合併
 
 version: '3.8'
 
