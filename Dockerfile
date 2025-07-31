@@ -80,8 +80,10 @@ RUN groupadd -g 1000 www && \
 COPY docker/php/php.ini /usr/local/etc/php/php.ini
 COPY docker/php/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 
-# 複製supervisor配置
+# 複製supervisor配置和啟動腳本
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/scripts/start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
 
 # 複製應用程式檔案
 COPY --chown=www:www . /var/www/html
@@ -99,7 +101,8 @@ RUN mkdir -p /var/www/html/storage/app/public && \
 
 # 建立supervisor日誌目錄
 RUN mkdir -p /var/log/supervisor && \
-    chown -R www:www /var/log/supervisor
+    chown -R www:www /var/log/supervisor && \
+    chmod -R 755 /var/log/supervisor
 
 # 切換到www使用者
 USER www
@@ -115,5 +118,5 @@ USER root
 # 暴露連接埠9000
 EXPOSE 9000
 
-# 使用supervisor管理進程
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# 使用啟動腳本
+CMD ["/usr/local/bin/start.sh"]
