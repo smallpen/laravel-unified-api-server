@@ -49,5 +49,5 @@ Thumbs.db
 /storage/logs/*.log
 /bootstrap/cache/*.php
 
-# Vendor 目錄（在 Dockerfile 中單獨處理）
-vendor/
+# Vendor 目錄在建構階段會重新生成，但不應該被完全排除
+# vendor/

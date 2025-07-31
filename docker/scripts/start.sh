@@ -5,6 +5,20 @@ set -e
 
 echo "正在啟動 Laravel 應用程式..."
 
+# 檢查 vendor 目錄是否存在
+if [ ! -d "/var/www/html/vendor" ] || [ ! -f "/var/www/html/vendor/autoload.php" ]; then
+    echo "錯誤：vendor 目錄或 autoload.php 檔案不存在！"
+    echo "正在重新安裝 Composer 依賴..."
+    composer install --no-dev --optimize-autoloader --no-interaction
+    
+    if [ ! -f "/var/www/html/vendor/autoload.php" ]; then
+        echo "致命錯誤：無法建立 vendor/autoload.php 檔案"
+        exit 1
+    fi
+else
+    echo "vendor 目錄檢查通過"
+fi
+
 # 檢查並產生 APP_KEY（如果不存在或為空）
 if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "" ]; then
     echo "產生應用程式金鑰..."

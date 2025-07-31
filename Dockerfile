@@ -46,7 +46,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # 複製composer檔案並安裝依賴
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction --verbose
+
+# 驗證 vendor 目錄是否正確建立
+RUN ls -la /var/www/html/vendor && test -f /var/www/html/vendor/autoload.php
 
 # 生產階段
 FROM php:8.1-fpm
@@ -86,11 +89,14 @@ COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/scripts/start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-# 複製應用程式檔案
+# 複製應用程式檔案（排除 vendor 目錄）
 COPY --chown=www:www . /var/www/html
 
 # 重新複製 vendor 目錄以確保不被覆蓋
 COPY --from=builder --chown=www:www /var/www/html/vendor/ /var/www/html/vendor/
+
+# 驗證 vendor 目錄在最終階段是否存在
+RUN ls -la /var/www/html/vendor && test -f /var/www/html/vendor/autoload.php
 
 # 建立必要的Laravel目錄結構並設定權限
 RUN mkdir -p /var/www/html/storage/app/public && \
