@@ -5,6 +5,10 @@ set -e
 
 echo "正在啟動 Laravel 應用程式..."
 
+# 重新設定環境變數為生產環境（覆蓋建置時的設定）
+export APP_ENV=${APP_ENV:-production}
+echo "設定應用程式環境為: $APP_ENV"
+
 # 檢查 vendor 目錄是否存在
 if [ ! -d "/var/www/html/vendor" ] || [ ! -f "/var/www/html/vendor/autoload.php" ]; then
     echo "錯誤：vendor 目錄或 autoload.php 檔案不存在！"

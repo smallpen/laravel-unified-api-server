@@ -17,11 +17,6 @@ class ExceptionServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // 在建置階段跳過服務註冊以避免依賴解析問題
-        if (env('APP_ENV') === 'building') {
-            return;
-        }
-
         $this->app->singleton(ExceptionHandlerService::class, function ($app) {
             // 延遲解析 ResponseFormatterInterface 以避免循環依賴
             return new ExceptionHandlerService(

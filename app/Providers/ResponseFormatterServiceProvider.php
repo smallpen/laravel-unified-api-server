@@ -21,17 +21,23 @@ class ResponseFormatterServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // 將ResponseFormatterInterface綁定到ResponseFormatter實作
-        $this->app->bind(ResponseFormatterInterface::class, ResponseFormatter::class);
-
         // 註冊ResponseFormatter為單例服務
-        $this->app->singleton('response.formatter', function ($app) {
+        $this->app->singleton(ResponseFormatter::class, function ($app) {
             return new ResponseFormatter();
         });
 
+        // 將ResponseFormatterInterface綁定到ResponseFormatter實作
+        $this->app->singleton(ResponseFormatterInterface::class, function ($app) {
+            return $app->make(ResponseFormatter::class);
+        });
+
+        // 註冊別名服務
+        $this->app->singleton('response.formatter', function ($app) {
+            return $app->make(ResponseFormatter::class);
+        });
+
         // 提供別名方便使用
-        $this->app->alias('response.formatter', ResponseFormatter::class);
-        $this->app->alias('response.formatter', ResponseFormatterInterface::class);
+        $this->app->alias(ResponseFormatter::class, 'response.formatter');
     }
 
     /**
