@@ -89,6 +89,9 @@ RUN chmod +x /usr/local/bin/start.sh
 # 複製應用程式檔案
 COPY --chown=www:www . /var/www/html
 
+# 重新複製 vendor 目錄以確保不被覆蓋
+COPY --from=builder --chown=www:www /var/www/html/vendor/ /var/www/html/vendor/
+
 # 建立必要的Laravel目錄結構並設定權限
 RUN mkdir -p /var/www/html/storage/app/public && \
     mkdir -p /var/www/html/storage/framework/cache/data && \
