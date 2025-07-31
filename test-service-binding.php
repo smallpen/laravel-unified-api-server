@@ -14,6 +14,11 @@ $app = require_once __DIR__ . '/bootstrap/app.php';
 try {
     echo "=== Laravel 服務綁定測試 ===\n";
     
+    // 啟動應用程式
+    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+    $kernel->bootstrap();
+    echo "✓ 應用程式啟動成功\n";
+    
     // 測試 ResponseFormatterInterface 綁定
     echo "1. 測試 ResponseFormatterInterface 綁定...\n";
     $formatter = $app->make(\App\Contracts\ResponseFormatterInterface::class);
