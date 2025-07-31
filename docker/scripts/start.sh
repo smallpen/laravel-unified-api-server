@@ -5,6 +5,14 @@ set -e
 
 echo "正在啟動 Laravel 應用程式..."
 
+# 檢查並產生 APP_KEY（如果不存在或為空）
+if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "" ]; then
+    echo "產生應用程式金鑰..."
+    php artisan key:generate --force
+else
+    echo "應用程式金鑰已存在"
+fi
+
 # 等待資料庫連線
 echo "等待資料庫連線..."
 max_attempts=30
