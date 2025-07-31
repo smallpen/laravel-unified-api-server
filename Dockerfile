@@ -1,5 +1,5 @@
 # 多階段建構 - 建構階段
-FROM php:8.1-fpm as builder
+FROM php:8.1-fpm AS builder
 
 # 設定工作目錄
 WORKDIR /var/www/html
@@ -46,7 +46,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # 複製composer檔案並安裝依賴
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
 # 生產階段
 FROM php:8.1-fpm
@@ -58,6 +58,7 @@ WORKDIR /var/www/html
 COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 COPY --from=builder /var/www/html/vendor/ /var/www/html/vendor/
+COPY --from=builder /usr/bin/composer /usr/bin/composer
 
 # 安裝運行時依賴
 RUN apt-get update && apt-get install -y \
@@ -88,6 +89,9 @@ RUN chmod +x /usr/local/bin/start.sh
 # 複製應用程式檔案
 COPY --chown=www:www . /var/www/html
 
+# 確保 composer 依賴完整性
+RUN composer dump-autoload --optimize --no-dev
+
 # 建立必要的Laravel目錄結構並設定權限
 RUN mkdir -p /var/www/html/storage/app/public && \
     mkdir -p /var/www/html/storage/framework/cache/data && \
@@ -107,10 +111,8 @@ RUN mkdir -p /var/log/supervisor && \
 # 切換到www使用者
 USER www
 
-# 執行Laravel優化命令
-RUN php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
+# 執行Laravel優化命令（移除快取命令，讓啟動腳本處理）
+RUN php artisan package:discover --ansi
 
 # 切換回root用戶以啟動supervisor
 USER root
