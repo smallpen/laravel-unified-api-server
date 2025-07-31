@@ -19,20 +19,20 @@ fi
 # 檢查容器內的檔案
 echo ""
 echo "2. 檢查容器內的檔案結構..."
-docker-compose run --rm laravel ls -la /var/www/html/
+docker compose run --rm laravel ls -la /var/www/html/
 
 echo ""
 echo "3. 檢查容器內的 vendor 目錄..."
-if docker-compose run --rm laravel test -d /var/www/html/vendor; then
+if docker compose run --rm laravel test -d /var/www/html/vendor; then
     echo "✓ vendor 目錄存在"
-    docker-compose run --rm laravel ls -la /var/www/html/vendor/ | head -10
+    docker compose run --rm laravel ls -la /var/www/html/vendor/ | head -10
 else
     echo "✗ vendor 目錄不存在"
 fi
 
 echo ""
 echo "4. 檢查 autoload.php 檔案..."
-if docker-compose run --rm laravel test -f /var/www/html/vendor/autoload.php; then
+if docker compose run --rm laravel test -f /var/www/html/vendor/autoload.php; then
     echo "✓ vendor/autoload.php 存在"
 else
     echo "✗ vendor/autoload.php 不存在"
@@ -40,11 +40,11 @@ fi
 
 echo ""
 echo "5. 檢查 Composer 版本..."
-docker-compose run --rm laravel composer --version
+docker compose run --rm laravel composer --version
 
 echo ""
 echo "6. 檢查 PHP 版本..."
-docker-compose run --rm laravel php --version
+docker compose run --rm laravel php --version
 
 echo ""
 echo "=== 診斷完成 ==="
