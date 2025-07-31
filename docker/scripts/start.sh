@@ -44,6 +44,10 @@ chmod -R 755 /var/www/html/storage
 chmod -R 755 /var/www/html/bootstrap/cache
 chmod -R 755 /var/log/supervisor
 
+# 執行套件發現
+echo "執行套件發現..."
+php artisan package:discover --ansi
+
 # 清除快取
 echo "清除應用程式快取..."
 php artisan config:clear

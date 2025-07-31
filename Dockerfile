@@ -89,9 +89,6 @@ RUN chmod +x /usr/local/bin/start.sh
 # 複製應用程式檔案
 COPY --chown=www:www . /var/www/html
 
-# 確保 composer 依賴完整性
-RUN composer dump-autoload --optimize --no-dev
-
 # 建立必要的Laravel目錄結構並設定權限
 RUN mkdir -p /var/www/html/storage/app/public && \
     mkdir -p /var/www/html/storage/framework/cache/data && \
@@ -111,8 +108,11 @@ RUN mkdir -p /var/log/supervisor && \
 # 切換到www使用者
 USER www
 
-# 執行Laravel優化命令（移除快取命令，讓啟動腳本處理）
-RUN php artisan package:discover --ansi
+# 設定建置環境變數以跳過某些服務註冊
+ENV APP_ENV=building
+
+# 確保 composer 依賴完整性（跳過 package discovery 以避免建置時的依賴問題）
+RUN composer dump-autoload --optimize --no-dev --no-scripts
 
 # 切換回root用戶以啟動supervisor
 USER root
