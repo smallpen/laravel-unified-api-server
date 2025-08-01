@@ -18,6 +18,9 @@
 
 ### 🛠️ 功能說明
 - **[Action權限系統](Action-Permission-System.md)** - 權限控制系統的使用方法
+- **[完整權限系統指南](Complete-Permission-System-Guide.md)** - 多層級權限控制的完整指南
+- **[權限系統快速參考](Permission-System-Quick-Reference.md)** - 權限系統的快速參考指南
+- **[權限系統架構文檔](Permission-System-Architecture.md)** - 權限系統的技術架構和流程圖
 - **[文件生成器使用指南](Documentation-Generator-Usage.md)** - API文件自動生成功能
 - **[Swagger UI使用指南](Swagger-UI-Usage-Guide.md)** - API文件介面使用方法
 - **[例外處理系統](Exception-Handling-System.md)** - 錯誤處理機制說明

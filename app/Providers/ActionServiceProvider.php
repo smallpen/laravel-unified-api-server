@@ -32,35 +32,8 @@ class ActionServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // 只在非健康檢查的情況下執行自動發現
-        if ($this->shouldPerformAutoDiscovery()) {
-            $this->performAutoDiscovery();
-        }
-    }
-
-    /**
-     * 判斷是否應該執行自動發現
-     */
-    protected function shouldPerformAutoDiscovery(): bool
-    {
-        // 如果是透過 tinker 執行的健康檢查，跳過自動發現
-        if ($this->app->runningInConsole()) {
-            $command = $_SERVER['argv'][1] ?? '';
-            if ($command === 'tinker') {
-                return false;
-            }
-        }
-
-        // 檢查是否已經執行過自動發現（使用快取避免重複執行）
-        $cacheKey = 'action_registry_discovered';
-        if (cache()->has($cacheKey)) {
-            return false;
-        }
-
-        // 標記已執行，快取 5 分鐘
-        cache()->put($cacheKey, true, 300);
-        
-        return true;
+        // 執行自動發現
+        $this->performAutoDiscovery();
     }
 
     /**
