@@ -71,17 +71,9 @@ chmod -R 755 /var/www/html/storage
 chmod -R 755 /var/www/html/bootstrap/cache
 chmod -R 755 /var/log/supervisor
 
-# 測試服務綁定
-echo "測試服務綁定..."
-if php /var/www/html/test-binding.php; then
-    echo "✓ 服務綁定測試通過"
-    
-    # 執行套件發現
-    echo "執行套件發現..."
-    php artisan package:discover --ansi
-else
-    echo "✗ 服務綁定測試失敗，跳過套件發現"
-fi
+# 執行套件發現
+echo "執行套件發現..."
+php artisan package:discover --ansi || echo "套件發現失敗，繼續執行..."
 
 # 清除快取
 echo "清除應用程式快取..."
