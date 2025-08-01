@@ -77,21 +77,25 @@ class GetServerStatusAction extends BaseAction
     private function getUptime(): array
     {
         try {
-            if (function_exists('sys_getloadavg') && PHP_OS_FAMILY !== 'Windows') {
+            // 檢查 shell_exec 函數是否可用且不在 Windows 環境
+            if (function_exists('shell_exec') && PHP_OS_FAMILY !== 'Windows') {
                 $uptime = shell_exec('uptime');
-                return [
-                    'raw' => trim($uptime ?? ''),
-                    'status' => 'available'
-                ];
+                if ($uptime !== null) {
+                    return [
+                        'raw' => trim($uptime),
+                        'status' => 'available'
+                    ];
+                }
             }
             
+            // 如果無法取得 uptime，回傳替代資訊
             return [
-                'raw' => 'N/A (Windows or function not available)',
+                'raw' => 'N/A (shell_exec disabled or Windows environment)',
                 'status' => 'unavailable'
             ];
         } catch (\Exception $e) {
             return [
-                'raw' => 'Error retrieving uptime',
+                'raw' => 'Error retrieving uptime: ' . $e->getMessage(),
                 'status' => 'error'
             ];
         }
