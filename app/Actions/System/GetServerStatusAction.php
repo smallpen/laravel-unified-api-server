@@ -77,20 +77,37 @@ class GetServerStatusAction extends BaseAction
     private function getUptime(): array
     {
         try {
-            // 檢查 shell_exec 函數是否可用且不在 Windows 環境
-            if (function_exists('shell_exec') && PHP_OS_FAMILY !== 'Windows') {
-                $uptime = shell_exec('uptime');
-                if ($uptime !== null) {
-                    return [
-                        'raw' => trim($uptime),
-                        'status' => 'available'
-                    ];
+            // 使用 PHP 內建函數計算運行時間
+            if (function_exists('uptime') || file_exists('/proc/uptime')) {
+                // 嘗試讀取 /proc/uptime (Linux 系統)
+                if (file_exists('/proc/uptime') && is_readable('/proc/uptime')) {
+                    $uptimeData = file_get_contents('/proc/uptime');
+                    if ($uptimeData !== false) {
+                        $uptime = floatval(explode(' ', trim($uptimeData))[0]);
+                        $days = floor($uptime / 86400);
+                        $hours = floor(($uptime % 86400) / 3600);
+                        $minutes = floor(($uptime % 3600) / 60);
+                        
+                        return [
+                            'raw' => sprintf('up %d days, %d:%02d', $days, $hours, $minutes),
+                            'seconds' => $uptime,
+                            'status' => 'available'
+                        ];
+                    }
                 }
             }
             
-            // 如果無法取得 uptime，回傳替代資訊
+            // 使用 PHP 啟動時間作為替代方案
+            if (function_exists('getmypid') && function_exists('posix_getpgid')) {
+                return [
+                    'raw' => 'PHP process uptime available',
+                    'status' => 'limited'
+                ];
+            }
+            
+            // 如果都無法取得，回傳基本資訊
             return [
-                'raw' => 'N/A (shell_exec disabled or Windows environment)',
+                'raw' => 'Uptime information not available',
                 'status' => 'unavailable'
             ];
         } catch (\Exception $e) {
