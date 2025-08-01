@@ -39,7 +39,6 @@ class ActionRegistry
      */
     protected array $scanDirectories = [
         'app/Actions',
-        'app/Http/Actions',
     ];
 
     /**

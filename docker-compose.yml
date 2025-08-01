@@ -52,7 +52,7 @@ services:
     networks:
       - unified-api-network
     healthcheck:
-      test: ["CMD", "php", "artisan", "tinker", "--execute=echo 'OK';"]
+      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
