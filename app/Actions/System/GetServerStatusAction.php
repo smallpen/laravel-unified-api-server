@@ -77,43 +77,50 @@ class GetServerStatusAction extends BaseAction
     private function getUptime(): array
     {
         try {
-            // 使用 PHP 內建函數計算運行時間
-            if (function_exists('uptime') || file_exists('/proc/uptime')) {
-                // 嘗試讀取 /proc/uptime (Linux 系統)
-                if (file_exists('/proc/uptime') && is_readable('/proc/uptime')) {
-                    $uptimeData = file_get_contents('/proc/uptime');
-                    if ($uptimeData !== false) {
-                        $uptime = floatval(explode(' ', trim($uptimeData))[0]);
-                        $days = floor($uptime / 86400);
-                        $hours = floor(($uptime % 86400) / 3600);
-                        $minutes = floor(($uptime % 3600) / 60);
-                        
-                        return [
-                            'raw' => sprintf('up %d days, %d:%02d', $days, $hours, $minutes),
-                            'seconds' => $uptime,
-                            'status' => 'available'
-                        ];
-                    }
-                }
+            // 使用 PHP 內建的伺服器資訊
+            $serverInfo = [];
+            
+            // 嘗試從 $_SERVER 取得伺服器啟動時間相關資訊
+            if (isset($_SERVER['REQUEST_TIME_FLOAT'])) {
+                $requestTime = $_SERVER['REQUEST_TIME_FLOAT'];
+                $serverInfo['request_time'] = date('Y-m-d H:i:s', (int)$requestTime);
             }
             
-            // 使用 PHP 啟動時間作為替代方案
-            if (function_exists('getmypid') && function_exists('posix_getpgid')) {
-                return [
-                    'raw' => 'PHP process uptime available',
-                    'status' => 'limited'
-                ];
+            // 使用 PHP 程序啟動時間作為參考
+            if (function_exists('getmypid')) {
+                $pid = getmypid();
+                $serverInfo['php_pid'] = $pid;
             }
             
-            // 如果都無法取得，回傳基本資訊
-            return [
-                'raw' => 'Uptime information not available',
-                'status' => 'unavailable'
+            // 取得 PHP 版本和運行資訊
+            $phpInfo = [
+                'version' => PHP_VERSION,
+                'sapi' => PHP_SAPI,
+                'os' => PHP_OS_FAMILY,
+                'memory_limit' => ini_get('memory_limit')
             ];
+            
+            // 組合可用的系統資訊
+            $uptimeInfo = sprintf(
+                'PHP %s (%s) on %s - Memory: %s',
+                $phpInfo['version'],
+                $phpInfo['sapi'],
+                $phpInfo['os'],
+                $phpInfo['memory_limit']
+            );
+            
+            return [
+                'raw' => $uptimeInfo,
+                'php_info' => $phpInfo,
+                'server_info' => $serverInfo,
+                'status' => 'available'
+            ];
+            
         } catch (\Exception $e) {
             return [
-                'raw' => 'Error retrieving uptime: ' . $e->getMessage(),
-                'status' => 'error'
+                'raw' => 'System information not available in restricted environment',
+                'status' => 'restricted',
+                'note' => 'Running in shared hosting with open_basedir restrictions'
             ];
         }
     }
