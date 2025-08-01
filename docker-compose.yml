@@ -52,7 +52,7 @@ services:
     networks:
       - unified-api-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/api/health"]
+      test: ["CMD", "bash", "/usr/local/bin/health-check-laravel.sh"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -87,7 +87,9 @@ COPY docker/php/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 # 複製supervisor配置和啟動腳本
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/scripts/start.sh /usr/local/bin/start.sh
-RUN chmod +x /usr/local/bin/start.sh
+COPY docker/scripts/health-check-laravel.sh /usr/local/bin/health-check-laravel.sh
+RUN chmod +x /usr/local/bin/start.sh && \
+    chmod +x /usr/local/bin/health-check-laravel.sh
 
 # 複製應用程式檔案（排除 vendor 目錄）
 COPY --chown=www:www . /var/www/html
