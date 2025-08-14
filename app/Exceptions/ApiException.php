@@ -105,7 +105,12 @@ class ApiException extends Exception
      */
     public function toJsonResponse(): JsonResponse
     {
-        $formatter = app(\App\Contracts\ResponseFormatterInterface::class);
+        try {
+            $formatter = app(\App\Contracts\ResponseFormatterInterface::class);
+        } catch (\Throwable $e) {
+            // 如果無法從容器中解析，則建立一個新的實例
+            $formatter = new \App\Services\ResponseFormatter();
+        }
         
         return response()->json(
             $formatter->error($this->getMessage(), $this->getErrorCode(), $this->getDetails()),

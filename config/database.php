@@ -62,7 +62,7 @@ return [
 
         'another_db' => [
             'driver' => 'mysql',
-            'url' => 192.168.6.186',
+            'url' => '192.168.6.186',
             'host' => '192.168.6.186',
             'port' => env('DB_PORT', '3306'),
             'database' => 'databasename',

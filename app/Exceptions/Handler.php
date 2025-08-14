@@ -78,7 +78,12 @@ class Handler extends ExceptionHandler
      */
     protected function getResponseFormatter(): ResponseFormatterInterface
     {
-        return app(ResponseFormatterInterface::class);
+        try {
+            return app(ResponseFormatterInterface::class);
+        } catch (\Throwable $e) {
+            // 如果無法從容器中解析，則建立一個新的實例
+            return new \App\Services\ResponseFormatter();
+        }
     }
 
     /**
