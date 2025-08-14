@@ -20,7 +20,7 @@ class ExceptionServiceProvider extends ServiceProvider
         $this->app->singleton(ExceptionHandlerService::class, function ($app) {
             // 延遲解析 ResponseFormatterInterface 以避免循環依賴
             return new ExceptionHandlerService(
-                $app->make(\App\Contracts\ResponseFormatterInterface::class)
+                $app->make(\App\Services\ResponseFormatter::class)
             );
         });
     }
